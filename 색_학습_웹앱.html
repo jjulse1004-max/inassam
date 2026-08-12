@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>색, 눈앞에 펼쳐지는 빛 — 색 탐구 놀이터</title>
+<style>
+  :root{
+    --orange:#F26522;
+    --orange-d:#D8531A;
+    --teal:#00A99D;
+    --teal-d:#00857B;
+    --navy:#1B2A4A;
+    --navy-2:#243759;
+    --ink:#20242E;
+    --paper:#FBF9F5;
+    --card:#FFFFFF;
+    --line:#E6E1D6;
+    --muted:#7A7568;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    background:var(--navy);
+    color:#fff;
+    padding:34px 20px 90px;
+    position:relative;
+    overflow:hidden;
+  }
+  header::before{
+    content:"";
+    position:absolute;
+    right:-60px; top:-60px;
+    width:260px; height:260px;
+    border-radius:50%;
+    background:conic-gradient(var(--orange),#F7941D,#FFF200,#8DC63F,var(--teal),#0072BC,#2E3192,#662D91,#EC008C,var(--orange));
+    opacity:0.9;
+  }
+  header::after{
+    content:"";
+    position:absolute;
+    right:-60px; top:-60px;
+    width:260px; height:260px;
+    border-radius:50%;
+    background:radial-gradient(circle at center, var(--navy) 34%, transparent 35%);
+  }
+  .eyebrow{
+    font-size:13px;
+    letter-spacing:.14em;
+    font-weight:700;
+    color:var(--orange);
+    text-transform:uppercase;
+  }
+  h1{
+    margin:8px 0 4px;
+    font-size:clamp(28px,4.6vw,44px);
+    line-height:1.15;
+    font-weight:800;
+    max-width:640px;
+  }
+  header p{
+    max-width:560px;
+    color:#C9CFDD;
+    font-size:15px;
+    line-height:1.6;
+    margin:0;
+  }
+
+  /* ---------- Tabs ---------- */
+  .tabbar{
+    max-width:960px;
+    margin:-52px auto 0;
+    padding:0 20px;
+    position:relative;
+    z-index:2;
+  }
+  .tabs{
+    display:flex;
+    gap:8px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:8px;
+    box-shadow:0 12px 30px -14px rgba(27,42,74,0.35);
+    overflow-x:auto;
+  }
+  .tab{
+    flex:1 1 0;
+    min-width:110px;
+    border:none;
+    background:transparent;
+    padding:12px 10px;
+    border-radius:11px;
+    font-family:inherit;
+    font-size:14px;
+    font-weight:700;
+    color:var(--muted);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    transition:background .15s ease, color .15s ease;
+  }
+  .tab .dot{width:9px;height:9px;border-radius:50%;background:var(--line);flex:none;}
+  .tab.active{background:var(--navy);color:#fff;}
+  .tab.active .dot{background:var(--orange);}
+  .tab:not(.active):hover{background:#F2EFE6;color:var(--ink);}
+
+  main{max-width:960px;margin:0 auto;padding:28px 20px 80px;}
+  section.panel{display:none;}
+  section.panel.active{display:block; animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:26px;
+  }
+  .card + .card{margin-top:18px;}
+  h2{font-size:22px;margin:0 0 6px;font-weight:800;}
+  .desc{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0 0 20px;}
+
+  /* ---------- Wheel module ---------- */
+  .wheel-layout{display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start;}
+  #wheelCanvas{cursor:pointer;flex:none;}
+  .wheel-info{flex:1 1 260px;min-width:240px;}
+  .swatch-row{display:flex;gap:14px;margin-bottom:16px;}
+  .swatch{
+    flex:1;
+    border-radius:14px;
+    padding:16px;
+    color:#fff;
+    min-height:92px;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,0.06);
+  }
+  .swatch small{opacity:.85;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;}
+  .swatch strong{font-size:17px;}
+  .hint{
+    background:#F5F1E8;
+    border:1px dashed var(--line);
+    border-radius:12px;
+    padding:14px 16px;
+    font-size:13.5px;
+    color:var(--ink);
+    line-height:1.55;
+  }
+  .hint b{color:var(--orange-d);}
+
+  /* ---------- Mixer module ---------- */
+  .mixer-grid{display:flex;gap:32px;flex-wrap:wrap;}
+  .mixer-controls{flex:1 1 280px;min-width:260px;}
+  .slider-row{margin-bottom:18px;}
+  .slider-row label{display:flex;justify-content:space-between;font-size:13.5px;font-weight:700;margin-bottom:6px;}
+  .slider-row label span{color:var(--muted);font-weight:600;}
+  input[type=range]{width:100%;accent-color:var(--orange);}
+  .mixer-preview{flex:1 1 240px;min-width:220px;display:flex;flex-direction:column;gap:12px;}
+  .big-swatch{
+    height:150px;
+    border-radius:16px;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,0.08);
+    display:flex;align-items:flex-end;padding:14px;
+  }
+  .big-swatch span{background:rgba(0,0,0,0.35);color:#fff;padding:4px 10px;border-radius:8px;font-size:13px;font-weight:700;}
+  .fact-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .fact{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;}
+  .fact b{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;}
+  .badge{
+    display:inline-block;padding:5px 12px;border-radius:999px;font-size:12.5px;font-weight:700;
+    background:var(--navy);color:#fff;
+  }
+
+  /* ---------- Contrast module ---------- */
+  .contrast-pickers{display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap;}
+  .picker{flex:1;min-width:150px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center;}
+  .picker label{font-size:12.5px;font-weight:700;color:var(--muted);display:block;margin-bottom:8px;}
+  .picker input[type=color]{width:100%;height:44px;border:none;border-radius:10px;cursor:pointer;background:none;}
+  .stage{
+    border-radius:16px;overflow:hidden;display:flex;height:200px;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,0.08);margin-bottom:14px;
+  }
+  .stage div{flex:1;}
+  .verdict{border-radius:12px;padding:14px 16px;font-size:14px;font-weight:700;}
+  .verdict.yes{background:#E4F6F1;color:var(--teal-d);border:1px solid #B9E7DC;}
+  .verdict.no{background:#FBEFE6;color:var(--orange-d);border:1px solid #F3D6BC;}
+
+  /* ---------- Quiz module ---------- */
+  .qcount{font-size:13px;color:var(--muted);font-weight:700;margin-bottom:10px;}
+  .qtext{font-size:18px;font-weight:800;margin-bottom:18px;line-height:1.5;}
+  .options{display:grid;gap:10px;}
+  .opt{
+    text-align:left;border:1.5px solid var(--line);background:var(--paper);
+    border-radius:12px;padding:14px 16px;font-family:inherit;font-size:14.5px;font-weight:600;
+    cursor:pointer;transition:.15s;
+  }
+  .opt:hover{border-color:var(--orange);}
+  .opt.correct{border-color:var(--teal);background:#E4F6F1;color:var(--teal-d);}
+  .opt.wrong{border-color:var(--orange);background:#FBEFE6;color:var(--orange-d);}
+  .opt:disabled{cursor:default;}
+  .quiz-foot{display:flex;justify-content:space-between;align-items:center;margin-top:20px;}
+  .next-btn{
+    background:var(--navy);color:#fff;border:none;border-radius:10px;padding:11px 20px;
+    font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;visibility:hidden;
+  }
+  .next-btn.show{visibility:visible;}
+  .score-view{text-align:center;padding:30px 10px;}
+  .score-view .num{font-size:56px;font-weight:800;color:var(--orange);}
+  .score-view p{color:var(--muted);margin-top:6px;}
+  .restart{margin-top:18px;background:var(--teal);color:#fff;border:none;border-radius:10px;padding:11px 22px;font-family:inherit;font-weight:700;cursor:pointer;}
+
+  footer{text-align:center;padding:26px;color:var(--muted);font-size:12.5px;}
+
+  @media (max-width:600px){
+    .wheel-layout{flex-direction:column;align-items:center;}
+    #wheelCanvas{width:260px;height:260px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Color Lab · 1학년 미술</div>
+  <h1>색, 눈앞에 펼쳐지는 빛</h1>
+  <p>색상환을 눌러보고, 색을 직접 섞어보고, 보색을 나란히 놓아보면서 색의 원리를 몸으로 익히는 놀이터예요.</p>
+</header>
+
+<div class="tabbar">
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-panel="wheel"><span class="dot"></span>색상환 탐험</button>
+    <button class="tab" data-panel="mixer"><span class="dot"></span>색 만들기</button>
+    <button class="tab" data-panel="contrast"><span class="dot"></span>보색 대비 놀이터</button>
+    <button class="tab" data-panel="quiz"><span class="dot"></span>색 퀴즈</button>
+  </div>
+</div>
+
+<main>
+
+  <!-- 1. 색상환 탐험 -->
+  <section class="panel active" id="panel-wheel">
+    <div class="card">
+      <h2>색상환에서 보색 찾기</h2>
+      <p class="desc">색상환의 한 조각을 클릭해 보세요. 클릭한 색과, 색상환 반대편에 있는 보색이 함께 표시됩니다.</p>
+      <div class="wheel-layout">
+        <canvas id="wheelCanvas" width="300" height="300"></canvas>
+        <div class="wheel-info">
+          <div class="swatch-row">
+            <div class="swatch" id="swatchA" style="background:#cfcfcf;">
+              <small>선택한 색</small>
+              <strong id="nameA">색을 클릭해 보세요</strong>
+            </div>
+            <div class="swatch" id="swatchB" style="background:#cfcfcf;">
+              <small>보색</small>
+              <strong id="nameB">—</strong>
+            </div>
+          </div>
+          <div class="hint">
+            <b>보색이란?</b> 색상환에서 서로 정반대 위치에 있는 두 색이에요. 색상 차이가 가장 크기 때문에 함께 놓으면 서로를 더 선명하고 강하게 보이게 해줘요. (예: 수술복이 청록색인 이유 — 붉은 피의 보색이라 잔상을 줄여줘요.)
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. 색 만들기 -->
+  <section class="panel" id="panel-mixer">
+    <div class="card">
+      <h2>색상 · 명도 · 채도로 색 만들기</h2>
+      <p class="desc">슬라이더를 움직여 색의 3요소를 직접 조절해 보세요. 채도를 0으로 내리면 어떤 일이 벌어질까요?</p>
+      <div class="mixer-grid">
+        <div class="mixer-controls">
+          <div class="slider-row">
+            <label>색상 (Hue) <span id="hVal">0°</span></label>
+            <input type="range" id="hue" min="0" max="360" value="10">
+          </div>
+          <div class="slider-row">
+            <label>채도 (Saturation) <span id="sVal">80%</span></label>
+            <input type="range" id="sat" min="0" max="100" value="80">
+          </div>
+          <div class="slider-row">
+            <label>명도 (Lightness) <span id="lVal">50%</span></label>
+            <input type="range" id="light" min="0" max="100" value="50">
+          </div>
+        </div>
+        <div class="mixer-preview">
+          <div class="big-swatch" id="mixSwatch"><span id="mixHex">#000000</span></div>
+          <div class="fact-grid">
+            <div class="fact"><b>구분</b><span id="mixKind">유채색</span></div>
+            <div class="fact"><b>RGB</b><span id="mixRgb">-</span></div>
+          </div>
+          <div><span class="badge" id="mixNote">채도가 있는 선명한 색이에요</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 보색 대비 놀이터 -->
+  <section class="panel" id="panel-contrast">
+    <div class="card">
+      <h2>내가 고른 두 색, 보색일까?</h2>
+      <p class="desc">색을 두 개 골라 나란히 놓아보세요. 보색에 가까울수록 서로를 더 선명하게 도드라져 보이게 만들어요.</p>
+      <div class="contrast-pickers">
+        <div class="picker">
+          <label>색 1</label>
+          <input type="color" id="colorA" value="#ED1C24">
+        </div>
+        <div class="picker">
+          <label>색 2</label>
+          <input type="color" id="colorB" value="#00A99D">
+        </div>
+      </div>
+      <div class="stage">
+        <div id="stageA"></div>
+        <div id="stageB"></div>
+      </div>
+      <div class="verdict" id="verdict">색을 골라 보색 여부를 확인해 보세요.</div>
+    </div>
+  </section>
+
+  <!-- 4. 퀴즈 -->
+  <section class="panel" id="panel-quiz">
+    <div class="card">
+      <div id="quizBody"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>중학교 미술① · Ⅰ-3. 색, 눈앞에 펼쳐지는 빛 — 색 탐구 놀이터</footer>
+
+<script>
+/* ---------------- Tabs ---------------- */
+const tabs = document.querySelectorAll('.tab');
+tabs.forEach(t=>{
+  t.addEventListener('click', ()=>{
+    tabs.forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('panel-'+t.dataset.panel).classList.add('active');
+  });
+});
+
+/* ---------------- Color helpers ---------------- */
+function hslToHex(h,s,l){
+  s/=100; l/=100;
+  const k = n => (n + h/30) % 12;
+  const a = s * Math.min(l, 1-l);
+  const f = n => l - a * Math.max(-1, Math.min(k(n)-3, Math.min(9-k(n), 1)));
+  const toHex = x => Math.round(255*x).toString(16).padStart(2,'0');
+  return '#' + toHex(f(0)) + toHex(f(8)) + toHex(f(4));
+}
+function hexToRgb(hex){
+  const v = hex.replace('#','');
+  const num = parseInt(v,16);
+  return { r:(num>>16)&255, g:(num>>8)&255, b:num&255 };
+}
+function hexToHsl(hex){
+  let {r,g,b} = hexToRgb(hex);
+  r/=255; g/=255; b/=255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b);
+  let h,s,l=(max+min)/2;
+  if(max===min){ h=s=0; }
+  else{
+    const d=max-min;
+    s = l>0.5 ? d/(2-max-min) : d/(max+min);
+    switch(max){
+      case r: h=(g-b)/d+(g<b?6:0); break;
+      case g: h=(b-r)/d+2; break;
+      case b: h=(r-g)/d+4; break;
+    }
+    h*=60;
+  }
+  return {h, s:s*100, l:l*100};
+}
+
+/* ---------------- 1. Wheel ---------------- */
+const wheelNames = ["빨강","주황","노랑","연두","초록","청록","파랑","남색","보라","자주"];
+const wheelHex = ["#ED1C24","#F7941D","#FFF200","#8DC63F","#00A651","#00A99D","#0072BC","#2E3192","#662D91","#EC008C"];
+const WHEEL_N = 10;
+
+const canvas = document.getElementById('wheelCanvas');
+const ctx = canvas.getContext('2d');
+const cx = 150, cy = 150, R = 140;
+let selectedIdx = -1;
+
+function drawWheel(){
+  ctx.clearRect(0,0,300,300);
+  const n = WHEEL_N;
+  for(let i=0;i<n;i++){
+    const start = (-90 + i*360/n - 360/n/2) * Math.PI/180;
+    const end = (-90 + (i+1)*360/n - 360/n/2) * Math.PI/180;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,R,start,end);
+    ctx.closePath();
+    ctx.fillStyle = wheelHex[i];
+    ctx.fill();
+    const isSel = (i===selectedIdx);
+    const isComp = (i===(selectedIdx+5)%n && selectedIdx>=0);
+    ctx.lineWidth = (isSel||isComp) ? 4 : 1.4;
+    ctx.strokeStyle = (isSel||isComp) ? '#1B2A4A' : 'rgba(0,0,0,0.25)';
+    ctx.stroke();
+  }
+  ctx.beginPath();
+  ctx.arc(cx,cy,R,0,Math.PI*2);
+  ctx.lineWidth=2;
+  ctx.strokeStyle='rgba(0,0,0,0.15)';
+  ctx.stroke();
+}
+drawWheel();
+
+function segmentAt(x,y){
+  const dx = x-cx, dy = y-cy;
+  const dist = Math.sqrt(dx*dx+dy*dy);
+  if(dist>R) return -1;
+  let angle = Math.atan2(dy,dx) * 180/Math.PI;
+  angle = (angle + 90 + 360) % 360;
+  angle = (angle + 360/WHEEL_N/2) % 360;
+  return Math.floor(angle / (360/WHEEL_N));
+}
+
+canvas.addEventListener('click', (e)=>{
+  const rect = canvas.getBoundingClientRect();
+  const x = (e.clientX-rect.left) * (300/rect.width);
+  const y = (e.clientY-rect.top) * (300/rect.height);
+  const idx = segmentAt(x,y);
+  if(idx>=0){
+    selectedIdx = idx;
+    drawWheel();
+    const compIdx = (idx+5)%WHEEL_N;
+    document.getElementById('swatchA').style.background = wheelHex[idx];
+    document.getElementById('nameA').textContent = wheelNames[idx] + ' (' + wheelHex[idx] + ')';
+    document.getElementById('swatchB').style.background = wheelHex[compIdx];
+    document.getElementById('nameB').textContent = wheelNames[compIdx] + ' (' + wheelHex[compIdx] + ')';
+  }
+});
+
+/* ---------------- 2. Mixer ---------------- */
+const hueEl = document.getElementById('hue');
+const satEl = document.getElementById('sat');
+const lightEl = document.getElementById('light');
+
+function updateMixer(){
+  const h = +hueEl.value, s = +satEl.value, l = +lightEl.value;
+  document.getElementById('hVal').textContent = h+'°';
+  document.getElementById('sVal').textContent = s+'%';
+  document.getElementById('lVal').textContent = l+'%';
+  const hex = hslToHex(h,s,l);
+  const {r,g,b} = hexToRgb(hex);
+  document.getElementById('mixSwatch').style.background = hex;
+  document.getElementById('mixHex').textContent = hex.toUpperCase();
+  document.getElementById('mixRgb').textContent = `${r}, ${g}, ${b}`;
+  const kindEl = document.getElementById('mixKind');
+  const noteEl = document.getElementById('mixNote');
+  if(s===0){
+    kindEl.textContent = '무채색';
+    noteEl.textContent = l===0 ? '검정 — 채도가 없어요' : (l===100 ? '하양 — 채도가 없어요' : '회색 — 채도가 없어요');
+  } else {
+    kindEl.textContent = '유채색';
+    noteEl.textContent = s>=60 ? '채도가 높아 선명한 색이에요' : '채도가 낮아 탁한 색이에요';
+  }
+}
+[hueEl,satEl,lightEl].forEach(el=>el.addEventListener('input', updateMixer));
+updateMixer();
+
+/* ---------------- 3. Contrast playground ---------------- */
+const colorA = document.getElementById('colorA');
+const colorB = document.getElementById('colorB');
+const stageA = document.getElementById('stageA');
+const stageB = document.getElementById('stageB');
+const verdict = document.getElementById('verdict');
+
+function hueDiff(a,b){
+  let d = Math.abs(a-b) % 360;
+  return d>180 ? 360-d : d;
+}
+
+function updateContrast(){
+  const a = colorA.value, b = colorB.value;
+  stageA.style.background = a;
+  stageB.style.background = b;
+  const ha = hexToHsl(a).h, hb = hexToHsl(b).h;
+  const diff = hueDiff(ha,hb);
+  if(diff >= 150){
+    verdict.className = 'verdict yes';
+    verdict.textContent = `보색에 가까워요! (색상 차이 약 ${Math.round(diff)}°) 두 색이 서로 도드라져 보이죠?`;
+  } else if(diff >= 90){
+    verdict.className = 'verdict yes';
+    verdict.textContent = `대비가 꽤 큰 편이에요 (색상 차이 약 ${Math.round(diff)}°). 보색에 가깝게 만들어 보세요.`;
+  } else {
+    verdict.className = 'verdict no';
+    verdict.textContent = `색상 차이가 약 ${Math.round(diff)}°로 가까운 색이에요. 색상환에서 반대쪽 색을 골라 보세요.`;
+  }
+}
+colorA.addEventListener('input', updateContrast);
+colorB.addEventListener('input', updateContrast);
+updateContrast();
+
+/* ---------------- 4. Quiz ---------------- */
+const questions = [
+  {
+    q: "색의 3요소가 아닌 것은 무엇일까요?",
+    options: ["색상", "명도", "채도", "질감"],
+    answer: 3
+  },
+  {
+    q: "다른 색이 섞이지 않은, 채도가 가장 높은 순수한 색을 무엇이라고 할까요?",
+    options: ["순색", "보색", "무채색", "중간색"],
+    answer: 0
+  },
+  {
+    q: "색상환에서 서로 정반대에 위치해 색상 차이가 가장 큰 색 관계는?",
+    options: ["유사색", "보색", "동일색", "명도 대비"],
+    answer: 1
+  },
+  {
+    q: "하양, 회색, 검정처럼 색상과 채도가 없고 명도만 있는 색은?",
+    options: ["유채색", "순색", "무채색", "보색"],
+    answer: 2
+  },
+  {
+    q: "빛의 3원색(빨강·초록·파랑)을 모두 합치면 어떤 색에 가까워질까요?",
+    options: ["검정", "하양", "회색", "노랑"],
+    answer: 1
+  },
+  {
+    q: "수술복이 청록색인 것은 어떤 원리와 관련이 있을까요?",
+    options: ["명도 대비", "채도 대비", "보색 대비", "면적 대비"],
+    answer: 2
+  }
+];
+
+let qIndex = 0, score = 0;
+
+function renderQuiz(){
+  const body = document.getElementById('quizBody');
+  if(qIndex >= questions.length){
+    body.innerHTML = `
+      <div class="score-view">
+        <div class="num">${score} / ${questions.length}</div>
+        <p>맞힌 문제 수예요. 잘 이해한 개념과 다시 살펴볼 개념을 확인해 보세요!</p>
+        <button class="restart" id="restartBtn">다시 풀기</button>
+      </div>`;
+    document.getElementById('restartBtn').addEventListener('click', ()=>{
+      qIndex = 0; score = 0; renderQuiz();
+    });
+    return;
+  }
+  const item = questions[qIndex];
+  body.innerHTML = `
+    <div class="qcount">문제 ${qIndex+1} / ${questions.length}</div>
+    <div class="qtext">${item.q}</div>
+    <div class="options" id="optWrap"></div>
+    <div class="quiz-foot">
+      <div></div>
+      <button class="next-btn" id="nextBtn">다음 문제</button>
+    </div>
+  `;
+  const wrap = document.getElementById('optWrap');
+  item.options.forEach((opt, i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.textContent = opt;
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.opt').forEach(o=>o.disabled = true);
+      if(i === item.answer){
+        btn.classList.add('correct');
+        score++;
+      } else {
+        btn.classList.add('wrong');
+        wrap.children[item.answer].classList.add('correct');
+      }
+      document.getElementById('nextBtn').classList.add('show');
+    });
+    wrap.appendChild(btn);
+  });
+  document.getElementById('nextBtn').addEventListener('click', ()=>{
+    qIndex++;
+    renderQuiz();
+  });
+}
+renderQuiz();
+</script>
+
+</body>
+</html>
