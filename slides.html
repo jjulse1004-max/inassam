@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>중학 미술 수업 슬라이드</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+  /* 레이아웃: 16:9 슬라이드 한 장을 화면에 맞게 줄이거나 늘려 보여 주고, 아래에 넘김 버튼과 단원 선택을 둠. */
+  :root{
+    --paper:#EFEBE2; --card:#FFFFFF; --sunk:#F3EFE6; --ink:#20242E; --muted:#5F5A4F; --line:#E3DDD0;
+    --navy:#1B2A4A; --on-navy:#FFFFFF; --navy-soft:#C9CFDD;
+    --orange:#D8531A; --orange-bg:#FBEFE6; --teal:#00857B; --teal-bg:#E4F6F1;
+    --display:"Black Han Sans","IBM Plex Sans KR","Malgun Gothic",sans-serif;
+    --body:"IBM Plex Sans KR","Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0B0F17; --card:#1C2331; --sunk:#262F40; --ink:#ECE8DF; --muted:#B0AB9F; --line:#39435A;
+      --navy:#0E1420; --on-navy:#FFFFFF; --navy-soft:#AEB6C8;
+      --orange:#FF9057; --orange-bg:#3A2418; --teal:#4FD1C5; --teal-bg:#12332F;
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0B0F17; --card:#1C2331; --sunk:#262F40; --ink:#ECE8DF; --muted:#B0AB9F; --line:#39435A;
+    --navy:#0E1420; --on-navy:#FFFFFF; --navy-soft:#AEB6C8;
+    --orange:#FF9057; --orange-bg:#3A2418; --teal:#4FD1C5; --teal-bg:#12332F;
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);word-break:keep-all;overflow-wrap:anywhere;-webkit-font-smoothing:antialiased;
+    display:flex;flex-direction:column;overflow:hidden;}
+  button,input,select{font-family:inherit;font-size:inherit;color:inherit;}
+  :focus-visible{outline:3px solid var(--orange);outline-offset:2px;}
+
+  #fit{flex:1;min-height:0;position:relative;overflow:hidden;}
+  #stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;margin:-360px 0 0 -640px;background:var(--card);color:var(--ink);
+    display:flex;flex-direction:column;padding:50px 72px 40px;overflow:hidden;transform-origin:center;}
+  #stage.dark{background:var(--navy);color:var(--on-navy);}
+  .bar{display:flex;gap:8px;align-items:center;background:var(--navy);color:var(--on-navy);padding-block:8px;
+    padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));font-size:14.5px;}
+  .bar button,.bar select{border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer;}
+  .bar select{flex:1 1 120px;min-width:0;max-width:320px;} .bar select option{color:#20242E;background:#fff;}
+  .bar button:disabled{opacity:.35;cursor:default;}
+  .bar .cnt{font-variant-numeric:tabular-nums;white-space:nowrap;margin-left:auto;color:#C9CFDD;}
+  .prog{height:4px;background:var(--line);} .prog i{display:block;height:100%;background:var(--orange);width:0;}
+
+  /* ---------- 슬라이드 공통 ---------- */
+  .dot{width:13px;height:13px;border-radius:50%;display:inline-block;flex:none;}
+  .a-체험 .dot{background:#F7941D;} .a-표현 .dot{background:#2CC5B6;} .a-감상 .dot{background:#C77DDB;}
+  .kick{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:700;letter-spacing:.06em;color:var(--muted);}
+  h2{font-family:var(--display);font-weight:400;font-size:50px;line-height:1.15;margin:8px 0 0;text-wrap:balance;}
+  h2 small{font-family:var(--body);font-size:20px;font-weight:600;color:var(--muted);margin-left:10px;}
+  .content{flex:1;min-height:0;margin-top:26px;font-size:23px;line-height:1.55;overflow:hidden;display:flex;flex-direction:column;gap:.8em;}
+  .content>p.sub{margin:0;font-size:1.1em;color:var(--muted);max-width:44em;}
+  .content>p.big{margin:auto 0;font-size:1.65em;line-height:1.6;max-width:28em;}
+  dl.terms{display:grid;gap:.6em;margin:0;grid-template-columns:repeat(var(--cols,2),minmax(0,1fr));}
+  dl.terms div{background:var(--sunk);border-radius:12px;padding:.65em .85em;}
+  dl.terms dt{font-weight:700;font-size:1.18em;color:var(--ink);} dl.terms dd{margin:.15em 0 0;}
+  ul.pts{margin:auto 0;padding-left:1.1em;font-size:1.35em;line-height:1.6;} ul.pts li{margin:.35em 0;}
+  ol.steps{margin:auto 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7em;counter-reset:s;}
+  ol.steps li{counter-increment:s;background:var(--sunk);border-radius:14px;padding:.8em .9em;font-size:1.3em;font-weight:700;display:flex;align-items:center;gap:.6em;line-height:1.35;}
+  ol.steps li::before{content:counter(s);background:var(--navy);color:var(--on-navy);width:1.7em;height:1.7em;border-radius:50%;display:grid;place-items:center;font-size:.8em;flex:none;}
+  table{border-collapse:collapse;width:100%;font-size:.96em;}
+  th,td{text-align:left;vertical-align:top;padding:.5em .7em;border-bottom:1.5px solid var(--line);}
+  th{background:var(--sunk);font-size:.85em;letter-spacing:.04em;white-space:nowrap;} td:first-child{font-weight:700;white-space:nowrap;}
+  .note{border-radius:16px;padding:1em 1.2em;font-size:1.3em;line-height:1.65;margin:auto 0;}
+  .note.idea{background:var(--orange-bg);} .note.check{background:var(--teal-bg);}
+  .note ul{margin:0;padding-left:1.1em;} .note li{margin:.4em 0;}
+  /* 단원 표지 */
+  .cover{margin:auto 0;} .cover h1{font-family:var(--display);font-weight:400;font-size:92px;line-height:1.1;margin:14px 0 22px;text-wrap:balance;}
+  .cover p{font-size:29px;line-height:1.6;color:var(--navy-soft);max-width:30em;margin:0;}
+  .cover .kick{color:var(--navy-soft);font-size:22px;}
+  .toc{display:grid;grid-template-columns:1fr 2.2fr 1.4fr;gap:26px;margin-top:30px;}
+  .toc h3{margin:0 0 8px;font-size:18px;letter-spacing:.1em;color:var(--navy-soft);display:flex;gap:8px;align-items:center;}
+  .toc div div{display:flex;flex-wrap:wrap;gap:8px;}
+  .toc button{border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;padding:7px 15px;font-size:18px;font-weight:600;cursor:pointer;}
+  .toc button:hover{background:#fff;color:#1B2A4A;}
+  /* 퀴즈 */
+  .qtext{font-size:1.5em;font-weight:700;line-height:1.45;margin:0;}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:.6em;}
+  .opt{text-align:left;border:2px solid var(--line);background:var(--sunk);border-radius:12px;padding:.7em .9em;font-size:1.15em;font-weight:600;cursor:pointer;}
+  .opt:hover:not(:disabled){border-color:var(--orange);}
+  .opt.right{border-color:var(--teal);background:var(--teal-bg);color:var(--teal);} .opt.wrong{border-color:var(--orange);background:var(--orange-bg);color:var(--orange);}
+  .fb{font-size:1.1em;min-height:1.6em;margin:0;} .fb b{color:var(--teal);}
+  /* 체험 도구 (content.js의 LABS가 만드는 구조) */
+  .lab{display:flex;flex-direction:column;gap:.5em;align-items:center;}
+  .lab h4{margin:0;font-size:1.05em;} .sm{font-size:.86em;color:var(--muted);margin:0;line-height:1.5;text-align:center;max-width:46em;}
+  .lab canvas{border-radius:12px;background:var(--sunk);touch-action:none;display:block;max-width:100%;}
+  #sph{height:270px;} #psp{height:372px;} #fpsC{height:230px;}
+  .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center;width:100%;}
+  .row label{font-weight:600;} input[type=range]{accent-color:var(--orange);flex:0 1 420px;min-width:0;}
+  .seg{display:inline-flex;border:2px solid var(--line);border-radius:10px;overflow:hidden;}
+  .seg button{border:none;background:transparent;padding:6px 16px;font-weight:600;cursor:pointer;} .seg button.on{background:var(--navy);color:var(--on-navy);}
+  .btn{border:none;background:var(--navy);color:var(--on-navy);border-radius:10px;padding:10px 22px;font-weight:700;cursor:pointer;text-decoration:none;}
+  .prin{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;}
+  .prin figure{margin:0;background:var(--sunk);border-radius:10px;padding:8px;color:var(--ink);}
+  .prin svg{width:100%;height:auto;display:block;background:var(--card);border-radius:6px;}
+  .prin figcaption{font-size:.7em;margin-top:5px;line-height:1.4;color:var(--muted);} .prin figcaption b{display:block;font-size:1.3em;color:var(--ink);}
+  .mixes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-items:start;}
+  .mixes .lab{align-items:stretch;} .mixes .sm{text-align:left;font-size:.82em;}
+  .mix{border-radius:12px;height:230px;position:relative;isolation:isolate;overflow:hidden;}
+  .mix.add{background:#000;} .mix.sub{background:#fff;border:1px solid var(--line);}
+  .mix i{position:absolute;width:124px;height:124px;border-radius:50%;left:50%;top:50%;margin:-62px;}
+  .mix.add i{mix-blend-mode:screen;} .mix.sub i{mix-blend-mode:multiply;}
+  .mix i:nth-child(1){transform:translate(0,-36px);} .mix i:nth-child(2){transform:translate(-36px,26px);} .mix i:nth-child(3){transform:translate(36px,26px);}
+  .tones{display:flex;border-radius:8px;overflow:hidden;border:1px solid var(--line);width:640px;max-width:100%;}
+  .tones span{flex:1;padding:6px 2px;font-size:.62em;font-weight:700;text-align:center;}
+</style>
+</head>
+<body>
+<div id="fit"><div id="stage" aria-live="polite"></div></div>
+<div class="prog"><i id="prog"></i></div>
+<div class="bar">
+  <button id="prev" aria-label="이전 슬라이드">이전</button>
+  <button id="next" aria-label="다음 슬라이드">다음</button>
+  <select id="jump" aria-label="단원 바로 가기"></select>
+  <span class="cnt" id="cnt"></span>
+  <button id="full">전체 화면</button>
+</div>
+
+<script src="content.js"></script>
+<script>
+/* content.js의 단원 내용을 슬라이드로 나누어 보여 줌. 키보드 ← → 로 넘김. */
+const SL=[];            // {u, n, dark, html, init}
+const first={};         // 단원 id → 첫 슬라이드 번호
+const split=(arr,max)=>{const k=Math.ceil(arr.length/max),size=Math.ceil(arr.length/k),out=[];for(let i=0;i<arr.length;i+=size)out.push(arr.slice(i,i+size));return out;};
+const aname=a=>AREAS.find(x=>x[0]===a)[1];
+function head(u,title,part){return `<div class="kick a-${u.area}"><span class="dot"></span>${aname(u.area)} · ${u.title}</div><h2>${title}${part?`<small>${part}</small>`:""}</h2>`;}
+
+(function build(){
+  SL.push({u:null,dark:true,html:`<div class="cover"><div class="kick">미적 체험 · 표현 · 감상</div><h1 style="font-size:76px;margin-bottom:10px">중학 미술 수업 슬라이드</h1>
+    <p style="font-size:24px">단원 이름을 누르면 그 단원으로 이동해요. 키보드의 ← → 또는 아래 버튼으로 넘겨요.</p>
+    <div class="toc">`+AREAS.map(([a,n])=>`<div class="a-${a}"><h3><span class="dot"></span>${n}</h3><div>`+UNITS.filter(u=>u.area===a).map(u=>`<button data-go="${u.id}">${u.title}</button>`).join("")+`</div></div>`).join("")+`</div></div>`});
+  for(const u of UNITS){
+    first[u.id]=SL.length;
+    const add=(html,o={})=>SL.push({u,html,...o});
+    add(`<div class="cover a-${u.area}"><div class="kick"><span class="dot"></span>${aname(u.area)} 영역 · ${UNITS.indexOf(u)+1}단원</div><h1>${u.title}</h1><p>${u.lead}</p></div>`,{dark:true});
+    for(const s of u.secs){
+      let sub=s.p?`<p class="sub">${s.p}</p>`:"", used=false;
+      const body=(inner,part,init)=>{add(head(u,s.h,part)+`<div class="content">${used?"":sub}${inner}</div>`,{init});used=true;};
+      if(s.terms){const cs=split(s.terms,6);cs.forEach((c,i)=>body(`<dl class="terms" style="--cols:${c.length>4?3:2}">`+c.map(t=>`<div><dt>${t[0]}</dt><dd>${t[1]}</dd></div>`).join("")+`</dl>`,cs.length>1?`${i+1} / ${cs.length}`:""));}
+      if(s.table){const cs=split(s.table.rows,5);cs.forEach((c,i)=>body(`<table><thead><tr>`+s.table.head.map(x=>`<th>${x}</th>`).join("")+`</tr></thead><tbody>`+c.map(r=>`<tr>`+r.map(x=>`<td>${x}</td>`).join("")+`</tr>`).join("")+`</tbody></table>`,cs.length>1?`${i+1} / ${cs.length}`:""));}
+      if(s.steps) body(`<ol class="steps">`+s.steps.map(x=>`<li>${x}</li>`).join("")+`</ol>`);
+      if(s.pts) body(`<ul class="pts">`+s.pts.map(x=>`<li>${x}</li>`).join("")+`</ul>`);
+      if(s.lab&&s.lab!=="critique") body(LABS[s.lab].html,"",LABS[s.lab].init);
+      if(!used) add(head(u,s.h)+`<div class="content"><p class="big">${s.p}</p></div>`);
+    }
+    add(head(u,"함께 해 보기")+`<div class="content"><div class="note idea">${u.idea}</div></div>`);
+    add(head(u,"스스로 확인하기")+`<div class="content"><div class="note check"><ul>`+u.check.map(c=>`<li>${c}</li>`).join("")+`</ul></div></div>`);
+    const qs=QUIZ.filter(q=>q[0]===u.id);
+    qs.forEach((q,i)=>add(head(u,"퀴즈",`${i+1} / ${qs.length}`)+`<div class="content"><p class="qtext">${q[1]}</p><div class="opts">`+q[2].map((o,k)=>`<button class="opt" data-k="${k}">${k+1}. ${esc(o)}</button>`).join("")+`</div><p class="fb" id="fb">보기를 누르면 정답과 풀이가 나와요.</p></div>`,
+      {init(){const st=$("#stage");st.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{st.querySelectorAll(".opt").forEach(o=>{o.disabled=true;if(+o.dataset.k===q[3])o.classList.add("right");});if(+b.dataset.k!==q[3])b.classList.add("wrong");$("#fb").innerHTML=`<b>정답 ${q[3]+1}번.</b> ${q[4]}`;});}}));
+  }
+  SL.forEach((s,i)=>{s.n=s.u?i-first[s.u.id]+1:0;});
+})();
+
+let cur=0;
+const stage=$("#stage");
+function show(i,keepHash){
+  cur=Math.max(0,Math.min(SL.length-1,i));
+  const s=SL[cur];
+  stage.className=s.dark?"dark":"";
+  stage.innerHTML=s.html;
+  if(s.init) s.init();
+  const c=stage.querySelector(".content");
+  if(c){let f=c.querySelector("canvas,.mixes,.prin")?23:30;c.style.fontSize=f+"px";while((c.scrollHeight>c.clientHeight+1||c.scrollWidth>c.clientWidth+1)&&f>14){f-=1;c.style.fontSize=f+"px";}}
+  stage.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>show(first[b.dataset.go]));
+  $("#prev").disabled=cur===0; $("#next").disabled=cur===SL.length-1;
+  $("#cnt").textContent=(cur+1)+" / "+SL.length;
+  $("#prog").style.width=(cur/(SL.length-1)*100)+"%";
+  $("#jump").value=s.u?s.u.id:"home";
+  document.title=(s.u?s.u.title+" · ":"")+"중학 미술 수업 슬라이드";
+  if(!keepHash){try{history.replaceState(null,"","#"+(s.u?s.u.id+(s.n>1?"-"+s.n:""):"home"));}catch(e){}}
+}
+function fromHash(){
+  const m=decodeURIComponent(location.hash.slice(1)).match(/^([a-z]+)(?:-(\d+))?$/);
+  if(m&&first[m[1]]!=null){const last=(SL.findLastIndex(s=>s.u&&s.u.id===m[1]));show(Math.min(first[m[1]]+(m[2]?+m[2]-1:0),last),true);}
+  else show(0,true);
+}
+$("#jump").innerHTML=`<option value="home">처음(목차)</option>`+AREAS.map(([a,n])=>`<optgroup label="${n}">`+UNITS.filter(u=>u.area===a).map(u=>`<option value="${u.id}">${u.title}</option>`).join("")+`</optgroup>`).join("");
+$("#jump").onchange=e=>{show(e.target.value==="home"?0:first[e.target.value]);e.target.blur();};
+$("#prev").onclick=()=>show(cur-1); $("#next").onclick=()=>show(cur+1);
+addEventListener("keydown",e=>{
+  if(e.target.closest("input,select,textarea")||e.ctrlKey||e.metaKey||e.altKey) return;
+  if(["ArrowRight","PageDown"," "].includes(e.key)&&!e.target.closest("button")||e.key==="ArrowRight"){e.preventDefault();show(cur+1);}
+  else if(["ArrowLeft","PageUp"].includes(e.key)){e.preventDefault();show(cur-1);}
+  else if(e.key==="Home"){show(0);} else if(e.key==="End"){show(SL.length-1);}
+});
+let tx=null;
+stage.addEventListener("touchstart",e=>{tx=e.target.closest("canvas,input,button")?null:e.touches[0].clientX;},{passive:true});
+stage.addEventListener("touchend",e=>{if(tx==null)return;const d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)show(cur+(d<0?1:-1));tx=null;},{passive:true});
+
+const fit=$("#fit");
+function scale(){const k=Math.min(fit.clientWidth/1280,fit.clientHeight/720);stage.style.transform=`scale(${k})`;}
+new ResizeObserver(scale).observe(fit); scale();
+const fb=$("#full");
+if(!document.documentElement.requestFullscreen) fb.hidden=true;
+fb.onclick=()=>{const p=document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();if(p&&p.catch)p.catch(()=>{fb.textContent="전체 화면을 쓸 수 없어요";});};
+addEventListener("hashchange",fromHash);
+const redraw=()=>show(cur,true);
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",redraw);
+new MutationObserver(redraw).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(redraw);
+fromHash();
+</script>
+</body>
+</html>
