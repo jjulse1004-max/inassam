@@ -5,28 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>중학 미술 수업 슬라이드</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@700;900&family=Noto+Sans+KR:wght@400;500;700&display=swap">
 <style>
   /* 레이아웃: 16:9 슬라이드 한 장을 화면에 맞게 줄이거나 늘려 보여 주고, 아래에 넘김 버튼과 단원 선택을 둠. */
   :root{
-    --paper:#EFEBE2; --card:#FFFFFF; --sunk:#F3EFE6; --ink:#20242E; --muted:#5F5A4F; --line:#E3DDD0;
-    --navy:#1B2A4A; --on-navy:#FFFFFF; --navy-soft:#C9CFDD;
-    --orange:#D8531A; --orange-bg:#FBEFE6; --teal:#00857B; --teal-bg:#E4F6F1;
-    --display:"Black Han Sans","IBM Plex Sans KR","Malgun Gothic",sans-serif;
-    --body:"IBM Plex Sans KR","Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+    --paper:#EDE4CC; --card:#FFFAF0; --sunk:#F5EBCF; --ink:#262A4A; --muted:#62658A; --line:#E6D8B6;
+    --navy:#2F3780; --on-navy:#FFFFFF; --navy-soft:#D5D9F5;
+    --orange:#8A6212; --orange-bg:#F6E6BD; --teal:#3B46A8; --teal-bg:#E4E7FB;
+    --display:"Noto Serif KR","Batang","Malgun Gothic",serif;
+    --body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
-      --paper:#0B0F17; --card:#1C2331; --sunk:#262F40; --ink:#ECE8DF; --muted:#B0AB9F; --line:#39435A;
-      --navy:#0E1420; --on-navy:#FFFFFF; --navy-soft:#AEB6C8;
-      --orange:#FF9057; --orange-bg:#3A2418; --teal:#4FD1C5; --teal-bg:#12332F;
+      --paper:#0D0F22; --card:#20244A; --sunk:#2A2F5C; --ink:#F3ECDA; --muted:#A8ACD0; --line:#363B6B;
+      --navy:#101329; --on-navy:#FFFFFF; --navy-soft:#B9BEE6;
+      --orange:#E3B862; --orange-bg:#34315A; --teal:#9FABFF; --teal-bg:#262B5A;
       color-scheme:dark;
     }
   }
   :root[data-theme="dark"]{
-    --paper:#0B0F17; --card:#1C2331; --sunk:#262F40; --ink:#ECE8DF; --muted:#B0AB9F; --line:#39435A;
-    --navy:#0E1420; --on-navy:#FFFFFF; --navy-soft:#AEB6C8;
-    --orange:#FF9057; --orange-bg:#3A2418; --teal:#4FD1C5; --teal-bg:#12332F;
+    --paper:#0D0F22; --card:#20244A; --sunk:#2A2F5C; --ink:#F3ECDA; --muted:#A8ACD0; --line:#363B6B;
+      --navy:#101329; --on-navy:#FFFFFF; --navy-soft:#B9BEE6;
+      --orange:#E3B862; --orange-bg:#34315A; --teal:#9FABFF; --teal-bg:#262B5A;
     color-scheme:dark;
   }
   *{box-sizing:border-box;}
@@ -42,7 +42,7 @@
   #stage.dark{background:var(--navy);color:var(--on-navy);}
   .bar{display:flex;gap:8px;align-items:center;background:var(--navy);color:var(--on-navy);padding-block:8px;
     padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));font-size:14.5px;}
-  .bar button,.bar select{border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer;}
+  .bar button,.bar select{border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;border-radius:8px;padding:8px 14px;font-weight:700;cursor:pointer;}
   .bar select{flex:1 1 120px;min-width:0;max-width:320px;} .bar select option{color:#20242E;background:#fff;}
   .bar button:disabled{opacity:.35;cursor:default;}
   .bar .cnt{font-variant-numeric:tabular-nums;white-space:nowrap;margin-left:auto;color:#C9CFDD;}
@@ -52,8 +52,8 @@
   .dot{width:13px;height:13px;border-radius:50%;display:inline-block;flex:none;}
   .a-체험 .dot{background:#F7941D;} .a-표현 .dot{background:#2CC5B6;} .a-감상 .dot{background:#C77DDB;}
   .kick{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:700;letter-spacing:.06em;color:var(--muted);}
-  h2{font-family:var(--display);font-weight:400;font-size:50px;line-height:1.15;margin:8px 0 0;text-wrap:balance;}
-  h2 small{font-family:var(--body);font-size:20px;font-weight:600;color:var(--muted);margin-left:10px;}
+  h2{font-family:var(--display);font-weight:900;font-size:50px;line-height:1.15;margin:8px 0 0;text-wrap:balance;}
+  h2 small{font-family:var(--body);font-size:20px;font-weight:700;color:var(--muted);margin-left:10px;}
   .content{flex:1;min-height:0;margin-top:26px;font-size:23px;line-height:1.55;overflow:hidden;display:flex;flex-direction:column;gap:.8em;}
   .content>p.sub{margin:0;font-size:1.1em;color:var(--muted);max-width:44em;}
   .content>p.big{margin:auto 0;font-size:1.65em;line-height:1.6;max-width:28em;}
@@ -71,18 +71,18 @@
   .note.idea{background:var(--orange-bg);} .note.check{background:var(--teal-bg);}
   .note ul{margin:0;padding-left:1.1em;} .note li{margin:.4em 0;}
   /* 단원 표지 */
-  .cover{margin:auto 0;} .cover h1{font-family:var(--display);font-weight:400;font-size:92px;line-height:1.1;margin:14px 0 22px;text-wrap:balance;}
+  .cover{margin:auto 0;} .cover h1{font-family:var(--display);font-weight:900;font-size:92px;line-height:1.1;margin:14px 0 22px;text-wrap:balance;}
   .cover p{font-size:29px;line-height:1.6;color:var(--navy-soft);max-width:30em;margin:0;}
   .cover .kick{color:var(--navy-soft);font-size:22px;}
   .toc{display:grid;grid-template-columns:1fr 2.2fr 1.4fr;gap:26px;margin-top:30px;}
   .toc h3{margin:0 0 8px;font-size:18px;letter-spacing:.1em;color:var(--navy-soft);display:flex;gap:8px;align-items:center;}
   .toc div div{display:flex;flex-wrap:wrap;gap:8px;}
-  .toc button{border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;padding:7px 15px;font-size:18px;font-weight:600;cursor:pointer;}
-  .toc button:hover{background:#fff;color:#1B2A4A;}
+  .toc button{border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;padding:7px 15px;font-size:18px;font-weight:700;cursor:pointer;}
+  .toc button:hover{background:#fff;color:#262A4A;}
   /* 퀴즈 */
   .qtext{font-size:1.5em;font-weight:700;line-height:1.45;margin:0;}
   .opts{display:grid;grid-template-columns:1fr 1fr;gap:.6em;}
-  .opt{text-align:left;border:2px solid var(--line);background:var(--sunk);border-radius:12px;padding:.7em .9em;font-size:1.15em;font-weight:600;cursor:pointer;}
+  .opt{text-align:left;border:2px solid var(--line);background:var(--sunk);border-radius:12px;padding:.7em .9em;font-size:1.15em;font-weight:700;cursor:pointer;}
   .opt:hover:not(:disabled){border-color:var(--orange);}
   .opt.right{border-color:var(--teal);background:var(--teal-bg);color:var(--teal);} .opt.wrong{border-color:var(--orange);background:var(--orange-bg);color:var(--orange);}
   .fb{font-size:1.1em;min-height:1.6em;margin:0;} .fb b{color:var(--teal);}
@@ -92,9 +92,9 @@
   .lab canvas{border-radius:12px;background:var(--sunk);touch-action:none;display:block;max-width:100%;}
   #sph{height:270px;} #psp{height:372px;} #fpsC{height:230px;}
   .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center;width:100%;}
-  .row label{font-weight:600;} input[type=range]{accent-color:var(--orange);flex:0 1 420px;min-width:0;}
+  .row label{font-weight:700;} input[type=range]{accent-color:var(--orange);flex:0 1 420px;min-width:0;}
   .seg{display:inline-flex;border:2px solid var(--line);border-radius:10px;overflow:hidden;}
-  .seg button{border:none;background:transparent;padding:6px 16px;font-weight:600;cursor:pointer;} .seg button.on{background:var(--navy);color:var(--on-navy);}
+  .seg button{border:none;background:transparent;padding:6px 16px;font-weight:700;cursor:pointer;} .seg button.on{background:var(--navy);color:var(--on-navy);}
   .btn{border:none;background:var(--navy);color:var(--on-navy);border-radius:10px;padding:10px 22px;font-weight:700;cursor:pointer;text-decoration:none;}
   .prin{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;}
   .prin figure{margin:0;background:var(--sunk);border-radius:10px;padding:8px;color:var(--ink);}
@@ -132,7 +132,7 @@ const aname=a=>AREAS.find(x=>x[0]===a)[1];
 function head(u,title,part){return `<div class="kick a-${u.area}"><span class="dot"></span>${aname(u.area)} · ${u.title}</div><h2>${title}${part?`<small>${part}</small>`:""}</h2>`;}
 
 (function build(){
-  SL.push({u:null,dark:true,html:`<div class="cover"><div class="kick">미적 체험 · 표현 · 감상</div><h1 style="font-size:76px;margin-bottom:10px">중학 미술 수업 슬라이드</h1>
+  SL.push({u:null,dark:true,html:`<div class="cover"><div class="kick">미적 체험 · 표현 · 감상</div><h1 style="font-size:70px;margin-bottom:10px">중학 미술 수업 슬라이드</h1>
     <p style="font-size:24px">단원 이름을 누르면 그 단원으로 이동해요. 키보드의 ← → 또는 아래 버튼으로 넘겨요.</p>
     <div class="toc">`+AREAS.map(([a,n])=>`<div class="a-${a}"><h3><span class="dot"></span>${n}</h3><div>`+UNITS.filter(u=>u.area===a).map(u=>`<button data-go="${u.id}">${u.title}</button>`).join("")+`</div></div>`).join("")+`</div></div>`});
   for(const u of UNITS){
