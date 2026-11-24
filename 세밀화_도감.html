@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>자연물 세밀화 도감</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=Nanum+Pen+Script&family=Cormorant+Garamond:ital,wght@1,500&display=swap">
+<style>
+/* Layout: 표본관(herbarium) 시트 — 왼쪽 큰 표본 판, 오른쪽 관찰 노트. 아래로 기법·격자 도구·활동지 */
+:root{
+  --paper:#EFF2EA; --card:#FBFCF8; --ink:#23261F; --ink-soft:#5A6152; --line:#D3D9C8;
+  --moss:#3F6233; --moss-soft:#E0E9D5; --ochre:#9A6A17; --grid:rgba(63,98,51,.10);
+  --f-display:"Gowun Batang","Noto Serif KR",serif;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-hand:"Nanum Pen Script","Gowun Batang",cursive;
+  --f-latin:"Cormorant Garamond",Georgia,serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#141813; --card:#1C211A; --ink:#E6E9DE; --ink-soft:#A5AD9A; --line:#333B2E;
+  --moss:#9EC386; --moss-soft:#25301F; --ochre:#D8A852; --grid:rgba(158,195,134,.08); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#141813; --card:#1C211A; --ink:#E6E9DE; --ink-soft:#A5AD9A; --line:#333B2E;
+  --moss:#9EC386; --moss-soft:#25301F; --ochre:#D8A852; --grid:rgba(158,195,134,.08); color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.7;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px}
+.wrap{max-width:1120px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;text-wrap:balance;margin:0;line-height:1.3}
+p{margin:0}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--moss);outline-offset:2px}
+
+/* header */
+header{padding-block:40px 24px;display:grid;gap:10px}
+.eyebrow{font-size:12.5px;letter-spacing:.14em;color:var(--moss);font-weight:600}
+h1{font-size:clamp(30px,5vw,46px)}
+.lede{color:var(--ink-soft);max-width:62ch}
+
+/* specimen index */
+.index{display:flex;gap:10px;overflow-x:auto;padding-block:6px 14px;scrollbar-width:thin}
+.chip{flex:0 0 auto;display:grid;grid-template-columns:44px auto;align-items:center;gap:10px;padding:8px 14px 8px 8px;
+  background:var(--card);border:1px solid var(--line);border-radius:10px;cursor:pointer;text-align:left;color:var(--ink)}
+.chip svg{width:44px;height:44px;color:var(--ink)}
+.chip b{display:block;font-family:var(--f-display);font-size:15px;line-height:1.2}
+.chip small{color:var(--ink-soft);font-size:12px;font-variant-numeric:tabular-nums}
+.chip[aria-pressed="true"]{border-color:var(--moss);background:var(--moss-soft)}
+
+/* plate + notes */
+.sheet{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:860px){.sheet{grid-template-columns:1fr}}
+.plateCol{display:grid;gap:12px;position:sticky;top:12px}
+@media (max-width:860px){.plateCol{position:static}}
+.plate{position:relative;background:var(--card);border:1px solid var(--line);border-radius:4px;aspect-ratio:1/1;max-width:100%;
+  background-image:radial-gradient(var(--grid) 1.2px,transparent 1.3px);background-size:22px 22px;overflow:hidden;touch-action:pan-y}
+.plate.loupeOn{cursor:none;touch-action:none}
+.plate > svg{width:100%;height:100%;display:block;color:var(--ink)}
+.label{position:absolute;right:12px;bottom:12px;background:var(--card);border:1px solid var(--ink-soft);padding:6px 10px;font-size:11.5px;line-height:1.45;min-width:150px}
+.label .no{font-variant-numeric:tabular-nums;color:var(--ochre);font-weight:600;letter-spacing:.06em}
+.label .sci{font-family:var(--f-latin);font-style:italic;font-size:14px}
+.loupe{position:absolute;width:150px;height:150px;border-radius:50%;border:2px solid var(--moss);overflow:hidden;pointer-events:none;
+  background:var(--card);box-shadow:0 6px 24px rgba(0,0,0,.18)}
+.loupe svg{position:absolute;color:var(--ink)}
+
+svg .L1,svg .L2,svg .L3{transition:opacity .45s ease,color .45s ease}
+svg[data-stage="1"] .L2, svg[data-stage="1"] .L3, svg[data-stage="2"] .L3{opacity:0}
+svg[data-stage="1"] .L1, svg[data-stage="2"] .L2, svg[data-stage="3"] .L3{color:var(--moss)}
+svg .notes{display:none}
+svg.showNotes .notes{display:inline}
+.notes text{font-family:var(--f-hand);font-size:19px;fill:var(--ochre);stroke:none}
+.notes path{stroke:var(--ochre);stroke-width:.8}
+.notes circle{fill:var(--ochre);stroke:none}
+.solid{fill:var(--card)}
+@media (prefers-reduced-motion:reduce){svg .L1,svg .L2,svg .L3{transition:none}}
+
+.stages{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--card)}
+.stages button{border:0;background:none;padding:9px 4px;cursor:pointer;font-size:13.5px;line-height:1.3;border-right:1px solid var(--line)}
+.stages button:last-child{border-right:0}
+.stages button span{display:block;font-size:11px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.stages button[aria-pressed="true"]{background:var(--moss);color:var(--card)}
+.stages button[aria-pressed="true"] span{color:inherit;opacity:.8}
+.toggles{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-size:13.5px;color:var(--ink-soft)}
+.toggles label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+.toggles input{accent-color:var(--moss);width:16px;height:16px}
+
+.notesCol{display:grid;gap:22px;min-width:0}
+.title h2{font-size:clamp(28px,4vw,36px)}
+.title .sci{font-family:var(--f-latin);font-style:italic;font-size:20px;color:var(--ink-soft)}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-block:1px solid var(--line);margin-top:12px}
+.facts div{padding:9px 10px 9px 0}
+.facts div+div{padding-left:12px;border-left:1px solid var(--line)}
+.facts dt{font-size:11.5px;letter-spacing:.08em;color:var(--ink-soft)}
+.facts dd{margin:0;font-weight:600;font-size:14px}
+.block h3{font-size:18px;margin-bottom:8px;display:flex;gap:8px;align-items:baseline}
+.block h3 small{font-family:var(--f-body);font-weight:400;font-size:12.5px;color:var(--ink-soft)}
+dl.obs{margin:0;display:grid;gap:8px}
+dl.obs > div{display:grid;grid-template-columns:5.2em 1fr;gap:10px}
+dl.obs dt{font-weight:600;color:var(--moss)}
+dl.obs dd{margin:0}
+ol.steps{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+ol.steps button{width:100%;display:grid;grid-template-columns:30px 1fr;gap:10px;text-align:left;background:none;border:1px solid transparent;border-radius:8px;padding:8px;cursor:pointer;line-height:1.6}
+ol.steps button:hover{background:var(--moss-soft)}
+ol.steps button[aria-current="true"]{border-color:var(--moss);background:var(--moss-soft)}
+.num{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--moss);color:var(--moss);display:grid;place-items:center;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+ol.steps b{display:block}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:520px){.duo{grid-template-columns:1fr}}
+.note{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:14.5px}
+.note h4{margin:0 0 4px;font-size:13px;letter-spacing:.06em}
+.note.tip h4{color:var(--moss)} .note.warn h4{color:var(--ochre)}
+.note ul{margin:0;padding-left:1.1em}
+.ask{font-family:var(--f-hand);font-size:23px;line-height:1.35;color:var(--ink);border-left:3px solid var(--ochre);padding-left:12px}
+
+/* sections */
+section.part{margin-top:64px;display:grid;gap:18px}
+.partHead{display:grid;gap:6px;border-top:1.5px solid var(--ink);padding-top:14px}
+.partHead h2{font-size:26px}
+.partHead p{color:var(--ink-soft);max-width:65ch}
+.tech{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+.tech figure{margin:0;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px;display:grid;gap:8px}
+.tech svg{width:100%;height:auto;color:var(--ink)}
+.tech figcaption b{display:block;font-family:var(--f-display);font-size:16px}
+.tech figcaption{font-size:13.5px;color:var(--ink-soft);line-height:1.55}
+.tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 24px;margin:0;padding:0;list-style:none}
+.tools li{display:grid;grid-template-columns:auto 1fr;gap:10px;border-bottom:1px dashed var(--line);padding-bottom:8px}
+.tools b{font-weight:600;white-space:nowrap}
+.tools span{color:var(--ink-soft);font-size:14px}
+
+.gridTool{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:860px){.gridTool{grid-template-columns:1fr}}
+.canvasBox{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:10px}
+.canvasBox canvas{width:100%;height:auto;display:block;max-width:100%}
+.controls{display:grid;gap:14px}
+.controls .row{display:grid;gap:6px}
+.controls label.t{font-size:13px;font-weight:600;letter-spacing:.04em}
+.controls select,.controls input[type=file]{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+.btn{border:1px solid var(--moss);background:var(--moss);color:var(--card);border-radius:8px;padding:9px 14px;cursor:pointer;font-weight:600}
+.btn.ghost{background:none;color:var(--moss)}
+.hint{font-size:13.5px;color:var(--ink-soft)}
+
+/* worksheet */
+.sheetTools{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.ws{background:#fff;color:#1d1f1a;border:1px solid var(--line);max-width:794px;width:100%;margin:0 auto;padding:36px 40px;font-size:13.5px;line-height:1.6}
+.ws h3{font-family:var(--f-display);font-size:22px;text-align:center}
+.ws .sub{text-align:center;color:#555;font-size:12.5px;margin-top:2px}
+.ws .who{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:18px}
+.ws .f{border-bottom:1px solid #333;padding:2px 0;min-height:28px;font-size:12px;color:#555;display:flex;gap:6px;align-items:end}
+.ws .f b{color:#1d1f1a;font-size:13.5px;font-weight:600}
+.ws .meta{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:10px;margin-top:10px}
+.ws .draw{margin-top:16px;border:1.2px solid #333;aspect-ratio:1.25/1;position:relative;max-width:100%}
+.ws .draw.g{background-image:linear-gradient(#e4e7e0 1px,transparent 1px),linear-gradient(90deg,#e4e7e0 1px,transparent 1px);background-size:37.8px 37.8px}
+.ws .tag{position:absolute;right:10px;bottom:10px;border:1px solid #333;background:#fff;padding:6px 10px;font-size:11px;line-height:1.7;width:180px}
+.ws .tag div{border-bottom:1px dotted #888}
+.ws .q{margin-top:14px;display:grid;gap:8px}
+.ws .q p{font-weight:600}
+.ws .lines{height:44px;background-image:linear-gradient(transparent 21px,#999 22px);background-size:100% 22px}
+.ws table{width:100%;border-collapse:collapse;margin-top:12px;font-size:12.5px}
+.ws td,.ws th{border:1px solid #888;padding:4px 8px}
+.ws th{background:#f1f3ee;font-weight:600}
+.ws td.c{text-align:center;width:52px;color:#777}
+.wsScroll{overflow-x:auto}
+
+footer{margin-top:56px;color:var(--ink-soft);font-size:13px;border-top:1px solid var(--line);padding-top:14px}
+
+@media print{
+  @page{size:A4;margin:12mm}
+  body{background:#fff;padding:0}
+  body *{visibility:hidden}
+  #ws,#ws *{visibility:visible}
+  #ws{position:absolute;left:0;top:0;border:0;padding:0;max-width:none}
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">중학교 미술 · 관찰 표현 · 세밀화</div>
+    <h1>자연물 세밀화 도감</h1>
+    <p class="lede">학교 둘레에서 주울 수 있는 자연물 여섯 가지를 골라, 무엇을 보고 어떤 순서로 그리면 좋은지 정리했어요. 표본을 고른 뒤 아래 단추로 <b>윤곽 → 세부 → 명암 → 완성</b> 순서를 따라가며 종이에 그려 보세요.</p>
+  </header>
+
+  <nav class="index" id="index" aria-label="표본 목록"></nav>
+
+  <main class="sheet">
+    <div class="plateCol">
+      <div class="plate" id="plate">
+        <div class="label" id="label"></div>
+        <div class="loupe" id="loupe" hidden></div>
+      </div>
+      <div class="stages" id="stages" role="group" aria-label="그리기 단계">
+        <button data-s="1"><span>1단계</span>윤곽</button>
+        <button data-s="2"><span>2단계</span>세부</button>
+        <button data-s="3"><span>3단계</span>명암</button>
+        <button data-s="4"><span>4단계</span>완성</button>
+      </div>
+      <div class="toggles">
+        <label><input type="checkbox" id="tNotes"> 부위 이름 보기</label>
+        <label><input type="checkbox" id="tLoupe"> 돋보기 (그림 위에 올려 보세요)</label>
+      </div>
+    </div>
+
+    <div class="notesCol" id="notes"></div>
+  </main>
+
+  <section class="part" id="technique">
+    <div class="partHead">
+      <h2>세밀화 기본 기법</h2>
+      <p>세밀화는 자연물을 <b>보이는 그대로, 정확하고 자세하게</b> 그리는 그림이에요. 색 대신 선과 점의 간격으로 어둡고 밝음(명암)을 나타내요. 본격적으로 그리기 전에 연습장에 아래 다섯 가지를 한 번씩 해 보세요.</p>
+    </div>
+    <div class="tech" id="tech"></div>
+    <div class="partHead" style="border-top-width:1px">
+      <h3 style="font-size:18px">준비물</h3>
+    </div>
+    <ul class="tools">
+      <li><b>연필 HB·4B</b><span>HB로 연하게 윤곽, 4B로 진한 그림자</span></li>
+      <li><b>피그먼트 펜 0.1·0.3</b><span>펜 세밀화를 할 때. 0.1은 결, 0.3은 윤곽</span></li>
+      <li><b>떡지우개</b><span>눌러서 찍어 내면 종이가 덜 상해요</span></li>
+      <li><b>돋보기</b><span>잎맥·비늘처럼 작은 무늬 관찰용</span></li>
+      <li><b>자</b><span>실제 크기를 재서 활동지에 기록</span></li>
+      <li><b>켄트지</b><span>표면이 매끈해 가는 선이 깔끔해요</span></li>
+    </ul>
+  </section>
+
+  <section class="part" id="gridtool">
+    <div class="partHead">
+      <h2>관찰 격자 도구</h2>
+      <p>내가 찍은 자연물 사진 위에 격자를 올려 비례를 맞춰 보세요. 종이에도 같은 칸수의 격자를 연하게 그린 뒤, 한 칸씩 옮겨 그리면 모양이 덜 틀어져요. <b>흑백</b>과 <b>명암 단순화</b>를 켜면 어디가 어둡고 밝은지 한눈에 보여요.</p>
+    </div>
+    <div class="gridTool">
+      <div class="canvasBox"><canvas id="gcv" width="900" height="900" aria-label="격자가 올려진 관찰 이미지"></canvas></div>
+      <div class="controls">
+        <div class="row"><label class="t" for="gFile">사진 올리기</label><input type="file" id="gFile" accept="image/*">
+          <p class="hint">사진은 이 브라우저 안에서만 쓰이고 어디에도 저장·전송되지 않아요. 사진을 올리기 전에는 지금 고른 표본 그림이 예시로 보여요.</p></div>
+        <div class="row"><label class="t" for="gN">격자 칸수</label>
+          <select id="gN"><option value="0">격자 없음</option><option value="3">3 × 3</option><option value="4" selected>4 × 4</option><option value="6">6 × 6</option><option value="8">8 × 8</option></select></div>
+        <div class="row"><label class="t" for="gTone">명암 보기</label>
+          <select id="gTone"><option value="0">원본 색</option><option value="1">흑백</option><option value="3" selected>명암 3단계 (밝음·중간·어두움)</option><option value="5">명암 5단계</option></select></div>
+        <button class="btn ghost" id="gSample" type="button">표본 예시로 되돌리기</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="part" id="worksheet">
+    <div class="partHead">
+      <h2>세밀화 관찰 활동지</h2>
+      <p>관찰 대상은 위에서 고른 표본으로 자동으로 채워져요. 이 파일을 크롬이나 엣지에서 직접 열고 <b>Ctrl + P</b>를 누르면 활동지만 A4 한 장으로 인쇄돼요.</p>
+    </div>
+    <div class="sheetTools toggles">
+      <label><input type="checkbox" id="wsGrid" checked> 그리기 칸에 1cm 격자 넣기</label>
+      <label><input type="checkbox" id="wsName" checked> 관찰 대상 이름 미리 채우기</label>
+    </div>
+    <div class="wsScroll">
+    <div class="ws" id="ws">
+      <h3>자연물 세밀화 관찰 활동지</h3>
+      <p class="sub">보이는 그대로, 천천히, 자세히</p>
+      <div class="who">
+        <div class="f">학년</div><div class="f">반</div><div class="f">번호</div><div class="f">이름</div>
+      </div>
+      <div class="meta">
+        <div class="f">관찰 대상 <b id="wsTarget"></b></div>
+        <div class="f">관찰한 날</div>
+        <div class="f">실제 크기 가로 &nbsp;&nbsp;&nbsp;cm · 세로 &nbsp;&nbsp;&nbsp;cm</div>
+      </div>
+      <div class="draw g" id="wsDraw">
+        <div class="tag"><div>표본 이름:</div><div>채집한 곳:</div><div>채집한 날:</div><div>그린 사람:</div></div>
+      </div>
+      <div class="q">
+        <p>1. 모양과 선: 전체 모양은 어떤 도형을 닮았나요? 가장자리는 어떤가요?</p><div class="lines"></div>
+        <p>2. 질감과 무늬: 손으로 만졌을 때와 돋보기로 보았을 때 무엇이 보였나요?</p><div class="lines"></div>
+        <p>3. 새로 발견한 점: 그리기 전에는 몰랐는데 그리면서 알게 된 것은?</p><div class="lines"></div>
+      </div>
+      <table>
+        <tr><th>스스로 점검하기</th><th>잘함</th><th>보통</th><th>노력</th></tr>
+        <tr><td>실제 크기와 비례를 재서 맞추었다.</td><td class="c">○</td><td class="c">○</td><td class="c">○</td></tr>
+        <tr><td>윤곽선과 결의 굵기를 다르게 표현했다.</td><td class="c">○</td><td class="c">○</td><td class="c">○</td></tr>
+        <tr><td>명암을 3단계 이상(밝음·중간·어두움)으로 나타냈다.</td><td class="c">○</td><td class="c">○</td><td class="c">○</td></tr>
+        <tr><td>끝까지 집중해서 관찰하며 그렸다.</td><td class="c">○</td><td class="c">○</td><td class="c">○</td></tr>
+      </table>
+    </div>
+    </div>
+  </section>
+
+  <footer>표본 그림은 수업용으로 단순화한 그림이에요. 실제 관찰에서는 표본마다 모양이 조금씩 다르니, 도감보다 <b>눈앞의 자연물</b>을 믿고 그려 주세요. 주운 깃털은 맨손 대신 지퍼백·장갑으로 다루고, 관찰 뒤에는 손을 씻어요.</footer>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+let uid=0;
+const f=n=>Math.round(n*10)/10;
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const rad=d=>d*Math.PI/180;
+function cub(p0,p1,p2,p3,t){const u=1-t;return[u*u*u*p0[0]+3*u*u*t*p1[0]+3*u*t*t*p2[0]+t*t*t*p3[0],u*u*u*p0[1]+3*u*u*t*p1[1]+3*u*t*t*p2[1]+t*t*t*p3[1]]}
+function poly(pts,close=true){return 'M'+pts.map(p=>f(p[0])+' '+f(p[1])).join(' L')+(close?' Z':'')}
+function smooth(pts,close=true){
+  const n=pts.length;const g=i=>close?pts[(i+n)%n]:pts[Math.max(0,Math.min(n-1,i))];
+  let d=`M${f(pts[0][0])} ${f(pts[0][1])}`;const last=close?n:n-1;
+  for(let i=0;i<last;i++){const p0=g(i-1),p1=g(i),p2=g(i+1),p3=g(i+2);
+    d+=` C${f(p1[0]+(p2[0]-p0[0])/6)} ${f(p1[1]+(p2[1]-p0[1])/6)} ${f(p2[0]-(p3[0]-p1[0])/6)} ${f(p2[1]-(p3[1]-p1[1])/6)} ${f(p2[0])} ${f(p2[1])}`}
+  return d+(close?' Z':'');
+}
+function shape(a){
+  if(Array.isArray(a))return a.map(shape).join('');
+  if(typeof a==='string')return `<path d="${a}"/>`;
+  if(a.rect)return `<rect x="${a.rect[0]}" y="${a.rect[1]}" width="${a.rect[2]}" height="${a.rect[3]}"/>`;
+  return `<ellipse cx="${a.cx}" cy="${a.cy}" rx="${a.rx}" ry="${a.ry}" transform="rotate(${a.rot||0} ${a.cx} ${a.cy})"/>`;
+}
+function clipWrap(clip,inner){if(!clip)return inner;const id='c'+(++uid);return `<defs><clipPath id="${id}">${shape(clip)}</clipPath></defs><g clip-path="url(#${id})">${inner}</g>`}
+function hatchD(angle,gap,seed,box){
+  const r=rng(seed||7),a=rad(angle),dx=Math.cos(a),dy=Math.sin(a),nx=-dy,ny=dx;
+  const cx0=box?box[0]:150,cy0=box?box[1]:150,L=box?box[2]:260;let d='';
+  for(let s=-L;s<=L;s+=gap){const cx=cx0+nx*s+(r()-.5)*gap*.25,cy=cy0+ny*s+(r()-.5)*gap*.25;
+    d+=`M${f(cx-dx*L)} ${f(cy-dy*L)} L${f(cx+dx*L)} ${f(cy+dy*L)} `}
+  return d;
+}
+function hatch(o){
+  return clipWrap(o.clip,clipWrap(o.area,`<path d="${hatchD(o.angle??45,o.gap??5,o.seed,o.box)}" stroke-width="${o.w??.55}" opacity="${o.op??1}"/>`));
+}
+function stipple(o){
+  const r=rng(o.seed||3);let s='';const a=o.area;
+  for(let i=0;i<(o.n||150);i++){const ang=r()*Math.PI*2,rr=Math.pow(r(),o.pow||.9);
+    const x=a.cx+Math.cos(ang)*rr*a.rx,y=a.cy+Math.sin(ang)*rr*a.ry;s+=`<circle cx="${f(x)}" cy="${f(y)}" r="${o.r||.75}"/>`}
+  return clipWrap(o.clip,`<g fill="currentColor" stroke="none">${s}</g>`);
+}
+function notes(list){
+  return '<g class="notes">'+list.map(([px,py,lx,ly,tx,ty,anc,txt])=>`<circle cx="${px}" cy="${py}" r="2.2"/><path d="M${px} ${py} L${lx} ${ly}"/><text x="${tx}" y="${ty}" text-anchor="${anc}">${txt}</text>`).join('')+'</g>';
+}
+
+/* ---------- 표본 ---------- */
+const SPEC=[
+{ id:'ginkgo', no:'01', name:'은행잎', sci:'Ginkgo biloba', family:'은행나무과', season:'10–11월', size:'잎몸 폭 5–8 cm', level:'★☆☆ 처음',
+  obs:[['모양','부채꼴이에요. 가운데가 얕게 갈라진 잎이 많지만, 갈라지지 않은 잎도 있어요.'],
+       ['잎맥','잎자루에서 부챗살처럼 퍼지면서 계속 두 갈래로 갈라져요. 그물 모양으로 이어지지 않아요.'],
+       ['가장자리','위쪽 가장자리가 물결처럼 살짝 울퉁불퉁해요.'],
+       ['명암','잎이 살짝 오목하게 휘어 있어서 잎자루 쪽이 가장 어두워요.']],
+  steps:[['윤곽','잎자루 끝, 부채 양 끝, 가운데 홈의 네 점을 먼저 찍고 이어요.'],
+         ['세부','잎맥을 잎자루 쪽에서 바깥쪽으로, 두 갈래씩 갈라지게 가늘게 그어요.'],
+         ['명암','잎자루 근처부터 빗금을 넣고, 바깥으로 갈수록 간격을 넓혀요.'],
+         ['완성','그림자 쪽(오른쪽) 윤곽선과 잎자루를 한 번 더 진하게 눌러 그려요.']],
+  tip:['잎맥은 윤곽선보다 연하고 가늘게 그려요.','빗금은 잎맥 방향을 따라 그으면 자연스러워요.'],
+  miss:['잎맥을 그물처럼 서로 잇기','모든 선을 같은 굵기로 그리기'],
+  ask:'잎맥이 끝까지 몇 번 갈라지는지 세어 볼까요? 갈라진 잎과 갈라지지 않은 잎을 나란히 놓고 비교해 보세요.',
+  build(){
+    const O="M150 192 C 122 178 78 145 56 98 C 72 72 106 57 138 63 C 143 66 147 74 150 84 C 153 74 157 66 162 63 C 194 57 228 72 244 98 C 222 145 178 178 150 192 Z";
+    const stem="M147.5 193 C 148.5 225 145.5 256 148 287 M152.5 193 C 153.5 225 150.5 256 153 287 M148 287 C 149.5 289 151.5 289 153 287";
+    const Lc=[[56,98],[72,72],[106,57],[138,63]],Rc=[[162,63],[194,57],[228,72],[244,98]];
+    let ends=[];for(let i=0;i<16;i++)ends.push(cub(...Lc,i/15*.97));for(let i=0;i<16;i++)ends.push(cub(...Rc,.03+i/15*.97));
+    const B=[150,190];const ratios=[1,.74,.52,.32,.12];let level=ends.map(p=>({p:[B[0]+(p[0]-B[0])*.99,B[1]+(p[1]-B[1])*.99],e:p}));
+    let d='';
+    for(let k=1;k<ratios.length;k++){const nxt=[];for(let i=0;i<level.length;i+=2){const a=level[i],b=level[i+1];const e=[(a.e[0]+b.e[0])/2,(a.e[1]+b.e[1])/2];
+        const p=[B[0]+(e[0]-B[0])*ratios[k],B[1]+(e[1]-B[1])*ratios[k]];d+=`M${f(p[0])} ${f(p[1])} L${f(a.p[0])} ${f(a.p[1])} M${f(p[0])} ${f(p[1])} L${f(b.p[0])} ${f(b.p[1])} `;nxt.push({p,e})}level=nxt}
+    level.forEach(n=>d+=`M${B[0]} ${B[1]} L${f(n.p[0])} ${f(n.p[1])} `);
+    return {
+      l1:`<path d="${O}" stroke-width="1.6"/><path d="${stem}" stroke-width="1.3"/>`,
+      l2:clipWrap(O,`<path d="${d}" stroke-width=".6"/>`),
+      l3:hatch({clip:O,area:{cx:150,cy:178,rx:58,ry:40},angle:62,gap:4.2,seed:2})+hatch({clip:O,area:{cx:150,cy:186,rx:28,ry:16},angle:-38,gap:3.4,seed:4})
+        +hatch({clip:O,area:{cx:220,cy:116,rx:42,ry:22,rot:-35},angle:28,gap:5.5,seed:5,op:.8})
+        +`<path d="M244 98 C 222 145 178 178 150 192" stroke-width="2.6"/><path d="M152.5 193 C 153.5 225 150.5 256 153 287" stroke-width="2"/>`,
+      notes:notes([[150,86,150,48,150,40,'middle','가운데 갈라진 홈'],[112,128,66,210,14,228,'start','두 갈래씩 갈라지는 잎맥'],[147,255,122,262,118,268,'end','잎자루'],[240,102,262,172,292,192,'end','물결 모양 가장자리']])
+    };
+  }},
+{ id:'maple', no:'02', name:'단풍잎', sci:'Acer palmatum', family:'단풍나무과', season:'10–11월', size:'잎 폭 6–10 cm', level:'★★☆ 보통',
+  obs:[['모양','손바닥처럼 5–7갈래로 깊게 갈라져요. 아래쪽 갈래가 위쪽보다 짧아요.'],
+       ['가장자리','작은 톱니 위에 더 작은 톱니가 있는 겹톱니예요.'],
+       ['잎맥','잎자루 끝 한 점에서 각 갈래 끝까지 굵은 주맥이 뻗고, 주맥에서 곁맥이 비스듬히 나와요.'],
+       ['명암','빨강·노랑 같은 색의 차이를 연필 진하기로 바꿔 표현해요. 진한 색일수록 진하게!']],
+  steps:[['윤곽','잎자루 끝에서 각 갈래 끝까지 주맥을 먼저 연하게 긋고, 그 끝을 이어 큰 윤곽을 잡아요.'],
+         ['세부','곁맥을 넣고 가장자리 톱니를 한 칸씩 그려요. 톱니 방향은 갈래 끝을 향해요.'],
+         ['명암','잎이 겹치거나 색이 진한 곳, 갈래 사이 오목한 곳에 빗금을 넣어요.'],
+         ['완성','주맥 양옆을 아주 살짝 어둡게 해서 잎맥이 도드라져 보이게 해요.']],
+  tip:['주맥을 먼저 그리면 갈래 각도가 틀어지지 않아요.','톱니는 크기가 조금씩 달라야 자연스러워요.'],
+  miss:['갈래를 다섯 개 모두 같은 길이로 그리기','톱니를 지그재그 무늬처럼 똑같이 반복하기'],
+  ask:'내가 주운 단풍잎은 몇 갈래인가요? 같은 나무의 잎끼리도 갈래 수가 다른지 확인해 보세요.',
+  build(){
+    const c=[150,158],R=118,pts=[[150,181]];
+    for(let a=98;a<=442;a+=1){const th=rad(a);const m=(((a+90)%72)+72)%72;const tri=Math.abs(m-36)/36;let r=R*(.36+.64*Math.pow(tri,1.05));r*=1-.28*Math.max(0,Math.sin(th));r*=1+.05*((a%7)/7)*(.25+tri);pts.push([c[0]+r*Math.cos(th),c[1]+r*Math.sin(th)])}
+    const O=poly(pts);
+    const stem="M148 179 C 147 220 150 255 146 288 M152 179 C 151 220 154 255 150 288 M146 288 L150 288";
+    let v='',v2='';const C=[150,174];
+    [270,342,54,126,198].forEach(a=>{const th=rad(a);const rt=R*(1-.28*Math.max(0,Math.sin(th)))*.94;const T=[c[0]+rt*Math.cos(th),c[1]+rt*Math.sin(th)];
+      v+=`M${C[0]} ${C[1]} Q${f((C[0]+T[0])/2+Math.cos(th+1.57)*3)} ${f((C[1]+T[1])/2+Math.sin(th+1.57)*3)} ${f(T[0])} ${f(T[1])} `;
+      [.3,.48,.64,.78].forEach((s,i)=>{const P=[C[0]+(T[0]-C[0])*s,C[1]+(T[1]-C[1])*s];const len=rt*.3*(1-s*.45);
+        [-1,1].forEach(sg=>{const b=th+sg*rad(42);v2+=`M${f(P[0])} ${f(P[1])} Q${f(P[0]+Math.cos(th+sg*rad(30))*len*.5)} ${f(P[1]+Math.sin(th+sg*rad(30))*len*.5)} ${f(P[0]+Math.cos(b)*len)} ${f(P[1]+Math.sin(b)*len)} `})})});
+    return {
+      l1:`<path d="${O}" stroke-width="1.4"/><path d="${stem}" stroke-width="1.3"/>`,
+      l2:clipWrap(O,`<path d="${v}" stroke-width="1.1"/><path d="${v2}" stroke-width=".55"/>`),
+      l3:hatch({clip:O,area:{cx:150,cy:165,rx:42,ry:38},angle:50,gap:4,seed:11})+hatch({clip:O,area:{cx:150,cy:170,rx:22,ry:18},angle:-40,gap:3.5,seed:12})
+        +hatch({clip:O,area:{cx:215,cy:132,rx:62,ry:44,rot:-15},angle:-35,gap:6,seed:13,op:.85})+hatch({clip:O,area:{cx:190,cy:215,rx:30,ry:26},angle:60,gap:5,seed:14,op:.85})
+        +stipple({clip:O,area:{cx:80,cy:140,rx:44,ry:34},n:170,seed:15}),
+      notes:notes([[150,100,112,52,20,46,'start','주맥(큰 잎맥)'],[98,152,42,196,14,212,'start','곁맥'],[226,151,262,190,292,206,'end','겹톱니'],[148,262,126,270,122,276,'end','잎자루']])
+    };
+  }},
+{ id:'pinecone', no:'03', name:'솔방울', sci:'Pinus densiflora', family:'소나무과', season:'사계절 (가을에 많이)', size:'길이 4–5 cm', level:'★★★ 도전',
+  obs:[['모양','달걀 모양이에요. 꼭지 쪽이 넓고 끝으로 갈수록 좁아져요.'],
+       ['배열','비늘 조각(실편)이 두 방향의 나선으로 돌아가며 붙어 있어요. 나선 줄 수를 세면 8, 13처럼 피보나치 수가 나오기도 해요.'],
+       ['비늘','비늘 끝은 마름모꼴이고, 가운데에 작은 돌기(배꼽)가 있어요.'],
+       ['명암','비늘마다 아래쪽에 짙은 그림자가 생겨요. 이 그림자가 입체감을 만들어요.']],
+  steps:[['윤곽','전체 달걀 모양과 꼭지를 연하게 잡아요. 가장자리는 나중에 비늘 끝으로 울퉁불퉁해져요.'],
+         ['세부','오른쪽·왼쪽으로 도는 나선 안내선을 연하게 긋고, 그 교차점마다 비늘을 하나씩 그려요.'],
+         ['명암','각 비늘의 아래쪽 틈을 가장 진하게 채워요. 가장자리로 갈수록 비늘이 좁아 보여요.'],
+         ['완성','빛 반대쪽(오른쪽) 전체에 빗금을 한 겹 더 얹어 둥근 부피감을 줘요.']],
+  tip:['비늘을 하나씩 다 그리기 전에 나선 안내선부터!','가운데 비늘은 크고 넓게, 옆 비늘은 좁고 납작하게 보여요.'],
+  miss:['비늘을 바둑판처럼 가로세로로 줄 세우기','틈의 그림자를 빼먹어 납작해 보이기'],
+  ask:'솔방울을 물에 30분 담가 두면 어떻게 될까요? 마른 솔방울과 젖은 솔방울을 그려서 비교해 보세요.',
+  build(){
+    const top=50,bot=262,cx=150;const W=y=>{const t=(bot-y)/(bot-top);if(t<=0||t>=1)return 0;return 74*Math.pow(Math.sin(Math.PI*Math.pow(t,.78)),.75)};
+    const R=[],Lp=[];for(let y=top;y<=bot;y+=3){R.push([cx+W(y),y]);Lp.unshift([cx-W(y),y])}
+    const O=smooth([[cx,top-2],...R,[cx,bot+2],...Lp]);
+    let sc='',sh='',dy=14,j=0;
+    for(let y=bot-10;y>top+6;y-=dy,j++){const w=W(y);if(w<6)continue;
+      for(let ph=-90+(j%2)*16;ph<=90;ph+=32){if(ph<=-88||ph>=88)continue;
+        const x=cx+w*Math.sin(rad(ph))*.98;const hw=w*Math.abs(Math.sin(rad(ph+16))-Math.sin(rad(ph-16)))/2*.96;const hh=dy*.78;if(hw<2.4)continue;
+        sc=`<path class="solid" fill="#fff" d="M${f(x-hw)} ${f(y)} L${f(x)} ${f(y-hh)} L${f(x+hw)} ${f(y)} Q${f(x)} ${f(y+hh*.95)} ${f(x-hw)} ${f(y)} Z" stroke-width=".9"/>`
+          +`<path d="M${f(x-hw*.75)} ${f(y-1)} Q${f(x)} ${f(y+hh*.12)} ${f(x+hw*.75)} ${f(y-1)}" stroke-width=".55"/>`
+          +`<path d="M${f(x)} ${f(y-hh*.18)} L${f(x+hw*.2)} ${f(y+hh*.08)} L${f(x)} ${f(y+hh*.3)} L${f(x-hw*.2)} ${f(y+hh*.08)} Z" stroke-width=".55"/>`+sc;
+        for(let u=.12;u<=.88;u+=.09){const px=x-hw+2*hw*u,py=y+2*u*(1-u)*.95*hh;const len=(3+4*(1-Math.abs(u-.5)*1.6))*(ph>0?1.3:1);sh+=`M${f(px)} ${f(py+.8)} L${f(px+.6)} ${f(py+len)} `}
+      }}
+    const stem="M145 262 C 146 272 145 280 143 290 L 156 290 C 155 280 154 272 155 262";
+    return {
+      l1:`<path d="${O}" stroke-width="1.5"/><path d="${stem}" stroke-width="1.3"/>`,
+      l2:clipWrap(O,sc),
+      l3:clipWrap(O,`<path d="${sh}" stroke-width=".7"/>`)+hatch({clip:O,area:{cx:210,cy:170,rx:42,ry:100},angle:70,gap:4.2,seed:21,op:.85})+hatch({clip:O,area:{cx:222,cy:175,rx:18,ry:70},angle:-25,gap:4,seed:22,op:.85}),
+      notes:notes([[172,112,232,60,290,52,'end','실편(비늘 조각)'],[196,150,242,118,292,112,'end','나선 배열'],[150,200,70,238,14,256,'start','배꼽(돌기)'],[146,282,124,286,120,291,'end','꼭지']])
+    };
+  }},
+{ id:'acorn', no:'04', name:'도토리', sci:'Quercus spp.', family:'참나무과', season:'9–10월', size:'길이 1.5–2.5 cm', level:'★★☆ 보통',
+  obs:[['모양','둥근 열매(견과)가 모자처럼 생긴 깍정이에 반쯤 들어가 있어요.'],
+       ['깍정이','작은 비늘이 기와처럼 겹겹이 덮여 있어요. 나무 종류에 따라 비늘이 길게 말리기도 해요.'],
+       ['표면','열매는 매끈하고 반짝여서 빛을 받는 곳에 하얀 하이라이트가 생겨요. 끝은 뾰족해요.'],
+       ['명암','깍정이 바로 아래에 띠 모양의 그림자가 생겨요.']],
+  steps:[['윤곽','열매의 타원과 깍정이의 반원을 따로 그려 겹쳐요. 맨 위 꼭지도 잊지 마세요.'],
+         ['세부','깍정이 비늘을 줄마다 엇갈리게 작은 반달 모양으로 채우고, 열매의 세로 줄무늬를 아주 연하게 넣어요.'],
+         ['명암','깍정이 아래 그림자 띠와 열매의 오른쪽을 빗금으로 어둡게 해요.'],
+         ['완성','하이라이트 자리는 처음부터 비워 두고, 주변만 진하게 해서 반짝임을 살려요.']],
+  tip:['하이라이트는 지우개로 만들기보다 처음부터 남겨 두는 게 깨끗해요.','깍정이는 점찍기(점묘)를 섞으면 거친 질감이 잘 살아요.'],
+  miss:['열매를 완전한 타원으로 그려 끝의 뾰족함을 놓치기','하이라이트까지 칠해 버리기'],
+  ask:'참나무 종류마다 도토리 모자(깍정이) 비늘 모양이 달라요. 친구가 주운 도토리와 비교해 어떤 점이 다른지 찾아보세요.',
+  build(){
+    const nut="M98 150 C 96 212 124 262 150 268 C 176 262 204 212 202 150 Z";
+    const nutClip="M98 155 C 96 212 124 262 150 268 C 176 262 204 212 202 155 C 190 165 110 165 98 155 Z";
+    const cap="M88 152 C 86 108 114 86 150 86 C 186 86 214 108 212 152 C 190 162 110 162 88 152 Z";
+    const stem="M145 88 C 145 79 143 72 141 64 C 145 61 150 61 153 63 C 153 72 155 80 155 88";
+    let sc='',row=0;for(let y=98;y<=156;y+=6.5,row++){const t=Math.max(0,1-Math.pow((y-152)/66,2));const hw=62*Math.sqrt(t);for(let x=150-hw+(row%2)*4.5;x<=150+hw;x+=9){sc+=`M${f(x-4.3)} ${f(y)} Q${f(x)} ${f(y+5.5)} ${f(x+4.3)} ${f(y)} `}}
+    let st='';[-.62,-.32,.3,.6].forEach(k=>st+=`M${f(150+k*52)} 166 Q${f(150+k*58)} 215 ${f(150+k*12)} 262 `);
+    return {
+      l1:`<path d="${nut}" stroke-width="1.5"/><path class="solid" fill="#fff" d="${cap}" stroke-width="1.5"/><path d="${stem}" stroke-width="1.3"/><path d="M150 268 L150 279" stroke-width="1.6"/>`,
+      l2:clipWrap(cap,`<path d="${sc}" stroke-width=".7"/>`)+`<path d="${st}" stroke-width=".5" opacity=".7"/>`,
+      l3:hatch({clip:nutClip,area:{cx:150,cy:161,rx:60,ry:12},angle:60,gap:2.8,seed:31})+hatch({clip:nutClip,area:{cx:150,cy:160,rx:58,ry:7},angle:-30,gap:3,seed:32})
+        +hatch({clip:nutClip,area:{cx:188,cy:212,rx:34,ry:66},angle:78,gap:4,seed:33})+hatch({clip:nutClip,area:{cx:198,cy:212,rx:15,ry:44},angle:-18,gap:4,seed:34})
+        +hatch({clip:nutClip,area:{cx:150,cy:262,rx:30,ry:14},angle:30,gap:3.6,seed:35,op:.8})
+        +stipple({clip:cap,area:{cx:178,cy:124,rx:42,ry:34},n:190,seed:36})+hatch({clip:cap,area:{cx:200,cy:132,rx:20,ry:32},angle:72,gap:3.4,seed:37}),
+      notes:notes([[118,112,74,72,14,64,'start','깍정이(모자)'],[148,68,190,50,194,48,'start','꼭지'],[118,200,64,232,14,248,'start','하이라이트'],[195,168,240,192,292,208,'end','모자 아래 그림자'],[149,277,118,286,112,291,'end','뾰족한 끝']])
+    };
+  }},
+{ id:'feather', no:'05', name:'깃털', sci:'Penna', family:'새의 날개깃', season:'사계절', size:'길이 8–15 cm', level:'★★★ 도전',
+  obs:[['구조','가운데 깃대(우축)가 있고, 양쪽으로 가는 깃가지(우지)가 비스듬히 빽빽하게 나 있어요.'],
+       ['비대칭','날개깃은 깃대를 기준으로 한쪽이 넓고 한쪽이 좁아요. 날기 위해 생긴 모양이에요.'],
+       ['갈라짐','깃가지 사이가 군데군데 벌어져 틈이 생겨요. 아래쪽에는 보송보송한 솜털이 있어요.'],
+       ['명암','줄무늬(띠)가 있는 깃털이 많아요. 깃대는 아래로 갈수록 굵고 속이 비어 보여요.']],
+  steps:[['윤곽','깃대를 한 번에 부드러운 곡선으로 긋고, 양쪽 날개면의 바깥 모양을 잡아요.'],
+         ['세부','깃가지를 깃대에서 바깥쪽 위로, 손목을 튕기듯 가볍게 그어요. 틈 자리는 비워 둬요.'],
+         ['명암','줄무늬 띠와 깃대 옆 그림자를 깃가지 방향으로 겹쳐 그어요.'],
+         ['완성','깃대 한쪽 선을 진하게, 아래 솜털은 아주 가늘고 구불구불하게 마무리해요.']],
+  tip:['깃가지는 끝이 가늘어지게, 힘을 빼면서 그어요.','깃가지 방향을 모두 같은 각도로 맞추면 오히려 딱딱해 보여요.'],
+  miss:['깃가지를 깃대와 직각으로 그리기','양쪽 날개면을 똑같은 폭으로 그리기'],
+  ask:'깃털의 깃가지를 손가락으로 살짝 벌렸다가 다시 쓸어 보세요. 왜 다시 붙는지 돋보기로 관찰해 볼까요?',
+  build(){
+    const P0=[150,292],P1=[151,210],P2=[158,120],P3=[170,22];const P=t=>cub(P0,P1,P2,P3,Math.min(1,Math.max(0,t)));
+    const T=t=>{const a=P(t-.005),b=P(t+.005);const dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy);return[dx/l,dy/l]};
+    const NL=t=>{const v=T(t);return[v[1],-v[0]]},NR=t=>{const v=T(t);return[-v[1],v[0]]};
+    const t0=.24;const wf=(t,m)=>{if(t<t0)return 0;const u=(t-t0)/(1-t0);return m*Math.pow(Math.sin(Math.PI*Math.min(1,u*.95+.05)),.6)*(1-.25*u)};
+    const wl=t=>wf(t,50),wr=t=>wf(t,26);
+    const edge=(t,side)=>{const p=P(t),n=side<0?NL(t):NR(t),w=side<0?wl(t):wr(t);return[p[0]+n[0]*w,p[1]+n[1]*w]};
+    const L=[],Rt=[];for(let t=t0;t<=1.0001;t+=.02){L.push(edge(t,-1));Rt.unshift(edge(t,1))}
+    const O=smooth([P(t0),...L,P(1),...Rt],true);
+    const rL=[],rR=[];for(let t=0;t<=1.0001;t+=.04){const p=P(t),n=NL(t),w=2.4*(1-t)+.5;rL.push([p[0]+n[0]*w,p[1]+n[1]*w]);rR.push([p[0]-n[0]*w,p[1]-n[1]*w])}
+    const rach=smooth(rL,false)+' '+smooth(rR,false)+` M${f(rL[0][0])} ${f(rL[0][1])} L${f(rR[0][0])} ${f(rR[0][1])}`;
+    const r=rng(41);let b='',dn='';const splits=[[-1,.58,.6],[-1,.76,.775],[1,.66,.675]];
+    [-1,1].forEach(sd=>{for(let t=t0+.012;t<.985;t+=.0075){if(splits.some(s=>s[0]===sd&&t>s[1]&&t<s[2]))continue;
+      const te=Math.min(.995,t+.06),s=P(t),n=sd<0?NL(t):NR(t),e=edge(te,sd),w=sd<0?wl(t):wr(t);
+      const c=[s[0]+n[0]*w*.55,s[1]+n[1]*w*.55];const jx=(r()-.5)*1.5;
+      b+=`M${f(s[0]+n[0]*1.6)} ${f(s[1]+n[1]*1.6)} Q${f(c[0])} ${f(c[1])} ${f(e[0]+jx)} ${f(e[1])} `}
+      for(let t=t0-.02;t<t0+.09;t+=.008){const s=P(t),n=sd<0?NL(t):NR(t);const len=(sd<0?30:22)*(1-(t-t0)*4);let x=s[0],y=s[1];dn+=`M${f(x)} ${f(y)}`;
+        for(let k=1;k<=4;k++){x=s[0]+n[0]*len*k/4+(r()-.5)*6;y=s[1]+n[1]*len*k/4-k*4+(r()-.5)*5;dn+=` L${f(x)} ${f(y)}`}dn+=' '}});
+    const band=(ua,ub)=>{const ta=t0+ua*(1-t0),tb=t0+ub*(1-t0),pts=[];for(let t=ta;t<=tb;t+=.01)pts.push(P(t));for(let t=tb;t>=ta;t-=.01)pts.push(edge(Math.min(1,t+.06),-1));return poly(pts)};
+    const bands=[band(.3,.37),band(.48,.55),band(.66,.72)];
+    const sideStrip=(()=>{const pts=[];for(let t=t0;t<=.97;t+=.02)pts.push(P(t));for(let t=.97;t>=t0;t-=.02){const p=P(t),n=NR(t);pts.push([p[0]+n[0]*9,p[1]+n[1]*9])}return poly(pts)})();
+    return {
+      l1:`<path d="${O}" stroke-width="1.2"/><path d="${rach}" stroke-width="1"/>`,
+      l2:`<path d="${b}" stroke-width=".45"/><path d="${dn}" stroke-width=".45" opacity=".85"/>`,
+      l3:hatch({clip:O,area:bands,angle:-58,gap:2.4,seed:42})+hatch({clip:O,area:bands,angle:20,gap:3.2,seed:43,op:.8})
+        +hatch({clip:O,area:sideStrip,angle:-60,gap:2.6,seed:44})+stipple({clip:O,area:{cx:168,cy:55,rx:22,ry:30},n:90,seed:45})
+        +`<path d="${smooth(rL,false)}" stroke-width="1.8"/>`,
+      notes:notes([[156,180,226,192,232,198,'start','깃대(우축)'],[124,96,70,74,14,70,'start','깃가지(우지)'],[113,136,58,150,14,166,'start','갈라진 틈'],[128,232,74,252,14,264,'start','솜털']])
+    };
+  }},
+{ id:'scallop', no:'06', name:'가리비 껍데기', sci:'Mizuhopecten yessoensis', family:'가리비과', season:'사계절 (바닷가·급식)', size:'폭 8–12 cm', level:'★★☆ 보통',
+  obs:[['모양','부채꼴이고, 아래쪽 꼭지(각정) 양옆에 귀처럼 생긴 날개가 붙어 있어요.'],
+       ['방사륵','꼭지에서 바깥으로 부챗살처럼 뻗은 굵은 골(방사륵)이 있어요. 가장자리가 골 때문에 물결 모양이 돼요.'],
+       ['성장선','나무의 나이테처럼 꼭지를 중심으로 둥근 선이 겹겹이 있어요. 조개가 자란 흔적이에요.'],
+       ['명암','골마다 한쪽 면이 그늘져서, 골과 골 사이가 번갈아 밝고 어두워요.']],
+  steps:[['윤곽','꼭지 한 점을 찍고 부채 양쪽 선과 둥근 가장자리, 아래 귀 두 개를 그려요.'],
+         ['세부','꼭지에서 가장자리로 방사륵을 같은 간격으로 나누어 그어요. 가운데부터 시작하면 쉬워요.'],
+         ['명암','골마다 같은 쪽(오른쪽) 면에만 빗금을 넣고, 성장선을 가로로 얹어요.'],
+         ['완성','가장자리 물결과 귀의 아래쪽을 진하게 눌러서 껍데기의 두께감을 살려요.']],
+  tip:['방사륵 간격을 먼저 점으로 나누어 두면 고르게 그릴 수 있어요.','성장선은 방사륵을 지날 때 살짝 꺾여요.'],
+  miss:['방사륵을 꼭지가 아닌 다른 곳에서 퍼지게 그리기','골의 양쪽 면을 모두 칠해 평평해 보이기'],
+  ask:'성장선을 세어 보면 무엇을 알 수 있을까요? 가장 촘촘한 곳과 넓은 곳은 어디인지 찾아보세요.',
+  build(){
+    const U=[150,234];const rf=a=>128*(1-.28*Math.pow(Math.abs(Math.cos(rad(a))),2.5));const sp=140/15;
+    const ept=(a,s=1)=>{const r=rf(a)*(1+.03*Math.cos(2*Math.PI*(a+160)/sp))*s;return[U[0]+r*Math.cos(rad(a)),U[1]+r*Math.sin(rad(a))]};
+    const pts=[U];for(let a=-160;a<=-20;a+=1)pts.push(ept(a));const O=poly(pts);
+    const ears="M150 236 L116 226 C 110 232 108 242 110 250 L150 250 Z M150 236 L184 226 C 190 232 192 242 190 250 L150 250 Z";
+    let ribs='';for(let k=0;k<15;k++){const a=-160+sp*(k+.5),e=ept(a);const m=[U[0]+(e[0]-U[0])*.5+Math.cos(rad(a+90))*1.5,U[1]+(e[1]-U[1])*.5+Math.sin(rad(a+90))*1.5];ribs+=`M${U[0]} ${U[1]-2} Q${f(m[0])} ${f(m[1])} ${f(e[0])} ${f(e[1])} `}
+    let el='';for(let y=232;y<=248;y+=4){el+=`M${f(117-(y-232)*.35)} ${y} L146 ${y} M${f(183+(y-232)*.35)} ${y} L154 ${y} `}
+    const r=rng(51);let gl='';[.28,.4,.51,.62,.72,.81,.89,.95].forEach(s=>{const p=[];for(let a=-158;a<=-22;a+=3){const q=ept(a,s);p.push([q[0]+(r()-.5)*1.2,q[1]+(r()-.5)*1.2])}gl+=smooth(p,false)+' '});
+    const wedges=[];for(let k=0;k<15;k++){const a0=-160+sp*k,a1=-160+sp*(k+.5);const w=[U];for(let a=a0;a<=a1+.01;a+=1)w.push(ept(a));wedges.push(poly(w))}
+    return {
+      l1:`<path d="${O}" stroke-width="1.5"/><path d="${ears}" stroke-width="1.3"/>`,
+      l2:clipWrap(O,`<path d="${ribs}" stroke-width=".8"/>`)+`<path d="${el}" stroke-width=".5"/>`,
+      l3:clipWrap(O,`<path d="${gl}" stroke-width=".55"/>`)+hatch({clip:O,area:wedges,angle:-75,gap:2.8,seed:52})
+        +hatch({clip:O,area:{cx:215,cy:175,rx:45,ry:55},angle:30,gap:5,seed:53,op:.7})+hatch({clip:"M110 250 L190 250 L190 243 L110 243 Z",angle:60,gap:3,seed:54})
+        +`<path d="${poly(pts.slice(1),false)}" stroke-width="2.2"/>`,
+      notes:notes([[192,150,240,84,292,72,'end','방사륵(부챗살 골)'],[108,172,52,122,14,112,'start','성장선'],[118,244,72,262,14,278,'start','귀'],[152,234,210,222,292,228,'end','꼭지(각정)']])
+    };
+  }}
+];
+
+function svgFor(sp,stage,extra=''){
+  const p=sp.build();
+  return `<svg viewBox="0 0 300 300" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-stage="${stage}" class="${extra}" role="img" aria-label="${sp.name} 세밀화 예시"><g class="L1">${p.l1}</g><g class="L2">${p.l2}</g><g class="L3">${p.l3}</g>${p.notes}</svg>`;
+}
+
+/* ---------- 상태 ---------- */
+let cur=SPEC[0],stage=4;
+const idx=$('#index');
+idx.innerHTML=SPEC.map(s=>`<button class="chip" data-id="${s.id}" aria-pressed="false">${svgFor(s,4)}<span><b>${s.name}</b><small>No. ${s.no} · ${s.level.split(' ')[0]}</small></span></button>`).join('');
+idx.addEventListener('click',e=>{const b=e.target.closest('.chip');if(b)select(b.dataset.id,true)});
+$('#stages').addEventListener('click',e=>{const b=e.target.closest('button');if(b)setStage(+b.dataset.s)});
+$('#tNotes').addEventListener('change',renderPlate);
+$('#tLoupe').addEventListener('change',()=>{$('#plate').classList.toggle('loupeOn',$('#tLoupe').checked);$('#loupe').hidden=true});
+
+function select(id,push){
+  cur=SPEC.find(s=>s.id===id)||SPEC[0];stage=4;
+  idx.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c.dataset.id===cur.id));
+  renderPlate();renderNotes();
+  if(push&&location.hash!=='#'+cur.id){try{history.replaceState(null,'','#'+cur.id)}catch(e){location.hash=cur.id}}
+  updateSheet();if(!toolUser)loadSample();
+}
+function renderPlate(){
+  const pl=$('#plate');pl.querySelector(':scope > svg')?.remove();
+  pl.insertAdjacentHTML('afterbegin',svgFor(cur,stage,$('#tNotes').checked?'showNotes':''));
+  $('#label').innerHTML=`<div class="no">표본 No. ${cur.no}</div><div><b>${cur.name}</b> · ${cur.family}</div><div class="sci">${cur.sci}</div><div>채집 시기 ${cur.season}</div>`;
+  syncStageUI();
+}
+function setStage(s){stage=s;const sv=$('#plate > svg');if(sv)sv.dataset.stage=s;syncStageUI()}
+function syncStageUI(){
+  $('#stages').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.s===stage));
+  document.querySelectorAll('ol.steps button').forEach(b=>b.setAttribute('aria-current',+b.dataset.s===stage));
+}
+function renderNotes(){
+  const s=cur;
+  $('#notes').innerHTML=`
+  <div class="title"><h2>${s.name}</h2><div class="sci">${s.sci}</div>
+    <dl class="facts"><div><dt>분류</dt><dd>${s.family}</dd></div><div><dt>실제 크기</dt><dd>${s.size}</dd></div><div><dt>난이도</dt><dd>${s.level}</dd></div></dl></div>
+  <div class="block"><h3>관찰 포인트 <small>그리기 전에 2분 동안 먼저 보기</small></h3>
+    <dl class="obs">${s.obs.map(o=>`<div><dt>${o[0]}</dt><dd>${o[1]}</dd></div>`).join('')}</dl></div>
+  <div class="block"><h3>그리는 순서 <small>누르면 왼쪽 그림이 그 단계로 바뀌어요</small></h3>
+    <ol class="steps">${s.steps.map((st,i)=>`<li><button data-s="${i+1}"><span class="num">${i+1}</span><span><b>${st[0]}</b>${st[1]}</span></button></li>`).join('')}</ol></div>
+  <div class="duo"><div class="note tip"><h4>표현 팁</h4><ul>${s.tip.map(t=>`<li>${t}</li>`).join('')}</ul></div>
+    <div class="note warn"><h4>자주 하는 실수</h4><ul>${s.miss.map(t=>`<li>${t}</li>`).join('')}</ul></div></div>
+  <div class="block"><h3>탐구 질문</h3><p class="ask">${s.ask}</p></div>`;
+  $('#notes').querySelectorAll('ol.steps button').forEach(b=>b.addEventListener('click',()=>setStage(+b.dataset.s)));
+  syncStageUI();
+}
+
+/* ---------- 돋보기 ---------- */
+const plate=$('#plate'),loupe=$('#loupe'),Z=2.6;
+plate.addEventListener('pointermove',e=>{
+  if(!$('#tLoupe').checked)return;
+  const r=plate.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+  if(x<0||y<0||x>r.width||y>r.height){loupe.hidden=true;return}
+  const src=plate.querySelector(':scope > svg');
+  let cl=loupe.querySelector('svg');
+  if(!cl||cl.dataset.k!==cur.id+stage+src.className.baseVal){loupe.innerHTML=src.outerHTML;cl=loupe.querySelector('svg');cl.dataset.k=cur.id+stage+src.className.baseVal}
+  cl.style.width=r.width*Z+'px';cl.style.height=r.height*Z+'px';cl.style.left=(75-x*Z)+'px';cl.style.top=(75-y*Z)+'px';
+  loupe.style.left=(x-75)+'px';loupe.style.top=(y-75)+'px';loupe.hidden=false;
+});
+plate.addEventListener('pointerleave',()=>loupe.hidden=true);
+
+/* ---------- 기법 견본 ---------- */
+(function(){
+  const box=(inner)=>`<svg viewBox="0 0 200 120" fill="none" stroke="currentColor" stroke-linecap="round">${inner}</svg>`;
+  const R=[10,10,180,100];
+  let grad='';{let x=14,g=2;while(x<190){grad+=`M${f(x)} 14 L${f(x-14)} 106 `;x+=g;g*=1.09}}
+  const lv=(x,n)=>{const a={rect:[x,14,52,92]};let s=hatch({area:a,angle:60,gap:4.2,seed:x});if(n>1)s+=hatch({area:a,angle:-30,gap:4.2,seed:x+1});if(n>2)s+=hatch({area:a,angle:15,gap:4.2,seed:x+2});return s+`<rect x="${x}" y="14" width="52" height="92" stroke-width=".8"/>`};
+  let dots='';{const r=rng(9);for(let i=0;i<900;i++){const x=14+Math.pow(r(),1.8)*172,y=14+r()*92;dots+=`<circle cx="${f(x)}" cy="${f(y)}" r=".9"/>`}}
+  const tone=[0,1,2,3,4].map(i=>{const x=12+i*36,a={rect:[x,30,32,60]};let s='';if(i>=1)s+=hatch({area:a,angle:60,gap:i>=2?3.4:5,seed:i});if(i>=3)s+=hatch({area:a,angle:-30,gap:3.4,seed:i+9});if(i>=4)s+=hatch({area:a,angle:10,gap:2.6,seed:i+19});return s+`<rect x="${x}" y="30" width="32" height="60" stroke-width=".8"/><text x="${x+16}" y="108" text-anchor="middle" font-size="10" fill="currentColor" stroke="none">${['밝음','','중간','','어두움'][i]}</text>`}).join('');
+  const items=[
+    ['윤곽선과 굵기',box(`<path d="M14 30 C 60 10 120 50 186 26" stroke-width=".5"/><path d="M14 60 C 60 40 120 80 186 56" stroke-width="1.2"/><path d="M14 92 C 60 72 120 112 186 88" stroke-width="2.4"/>`),'같은 선이라도 빛을 받는 쪽은 가늘게, 그림자 쪽은 굵게 그으면 입체감이 생겨요.'],
+    ['해칭 (빗금)',box(`<path d="${grad}" stroke-width=".6"/>`),'같은 방향의 평행선이에요. 간격이 좁을수록 어둡고, 넓을수록 밝아 보여요.'],
+    ['크로스해칭 (겹 빗금)',box(lv(12,1)+lv(74,2)+lv(136,3)),'빗금 위에 다른 방향의 빗금을 겹쳐요. 겹칠수록 한 단계씩 어두워져요.'],
+    ['점묘 (점찍기)',box(`<g fill="currentColor" stroke="none">${dots}</g>`),'펜을 수직으로 세워 점을 찍어요. 점이 모일수록 어두워지고, 거친 질감에 잘 어울려요.'],
+    ['명암 5단계',box(tone),'세밀화 한 장 안에 적어도 이 중 세 단계는 들어가야 입체감이 살아나요.']
+  ];
+  $('#tech').innerHTML=items.map(i=>`<figure>${i[1]}<figcaption><b>${i[0]}</b>${i[2]}</figcaption></figure>`).join('');
+})();
+
+/* ---------- 격자 도구 ---------- */
+const cv=$('#gcv'),cx=cv.getContext('2d');let toolImg=null,toolUser=false;
+function loadSample(){
+  let s=svgFor(cur,4).replace('<svg ','<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" style="color:#23261F" ');
+  const im=new Image();im.onload=()=>{toolImg=im;drawTool()};im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s);
+}
+function drawTool(){
+  if(!toolImg)return;const iw=toolImg.naturalWidth||900,ih=toolImg.naturalHeight||900;
+  const W=900,H=Math.round(Math.min(1200,Math.max(500,W*ih/iw)));cv.width=W;cv.height=H;
+  cx.fillStyle='#ffffff';cx.fillRect(0,0,W,H);const s=Math.min(W/iw,H/ih),w=iw*s,h=ih*s,ox=(W-w)/2,oy=(H-h)/2;cx.drawImage(toolImg,ox,oy,w,h);
+  const tone=+$('#gTone').value;
+  if(tone&&toolUser){try{const d=cx.getImageData(0,0,W,H),a=d.data;for(let i=0;i<a.length;i+=4){let l=.299*a[i]+.587*a[i+1]+.114*a[i+2];if(tone>1){const k=Math.min(tone-1,Math.floor(l/256*tone));l=Math.round(255*(k/(tone-1))*.92+10)}a[i]=a[i+1]=a[i+2]=l}cx.putImageData(d,0,0)}catch(e){}}
+  const n=+$('#gN').value;if(!n)return;
+  cx.strokeStyle='rgba(176,64,40,.75)';cx.lineWidth=2;cx.fillStyle='rgba(176,64,40,.9)';cx.font='600 20px "IBM Plex Sans KR",sans-serif';
+  for(let i=0;i<=n;i++){const x=ox+w*i/n,y=oy+h*i/n;cx.beginPath();cx.moveTo(x,oy);cx.lineTo(x,oy+h);cx.stroke();cx.beginPath();cx.moveTo(ox,y);cx.lineTo(ox+w,y);cx.stroke()}
+  for(let i=0;i<n;i++){cx.fillText(String.fromCharCode(65+i),ox+w*(i+.5)/n-6,oy+22);cx.fillText(String(i+1),ox+6,oy+h*(i+.5)/n+7)}
+}
+$('#gFile').addEventListener('change',e=>{const file=e.target.files[0];if(!file)return;const rd=new FileReader();rd.onload=()=>{const im=new Image();im.onload=()=>{toolImg=im;toolUser=true;drawTool()};im.src=rd.result};rd.readAsDataURL(file)});
+$('#gN').addEventListener('change',drawTool);$('#gTone').addEventListener('change',drawTool);
+$('#gSample').addEventListener('click',()=>{toolUser=false;$('#gFile').value='';loadSample()});
+
+/* ---------- 활동지 ---------- */
+function updateSheet(){$('#wsTarget').textContent=$('#wsName').checked?cur.name:'';$('#wsDraw').classList.toggle('g',$('#wsGrid').checked)}
+$('#wsGrid').addEventListener('change',updateSheet);$('#wsName').addEventListener('change',updateSheet);
+
+function fromHash(){const id=location.hash.slice(1);select(SPEC.some(s=>s.id===id)?id:SPEC[0].id,false)}
+window.addEventListener('hashchange',fromHash);
+fromHash();
+})();
+</script>
+
+</body>
+</html>
