@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>색연필 세밀화 도감</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=Nanum+Pen+Script&family=Cormorant+Garamond:ital,wght@1,500&display=swap">
+<style>
+/* Layout: 식물·동물 두 권으로 나뉜 표본 도감 — 왼쪽 GPT 그림 액자 + 색연필 팔레트, 오른쪽 관찰·채색 노트, 아래 기법·프롬프트 모음·활동지 */
+:root{
+  --paper:#EFF2EA; --card:#FBFCF8; --ink:#23261F; --ink-soft:#5A6152; --line:#D3D9C8;
+  --moss:#3F6233; --moss-soft:#E0E9D5; --rust:#A4472A; --rust-soft:#F3E2DA; --ochre:#9A6A17;
+  --acc:var(--moss); --acc-soft:var(--moss-soft);
+  --f-display:"Gowun Batang","Noto Serif KR",serif;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-hand:"Nanum Pen Script","Gowun Batang",cursive;
+  --f-latin:"Cormorant Garamond",Georgia,serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#141813; --card:#1C211A; --ink:#E6E9DE; --ink-soft:#A5AD9A; --line:#333B2E;
+  --moss:#9EC386; --moss-soft:#25301F; --rust:#E39276; --rust-soft:#3A2620; --ochre:#D8A852; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#141813; --card:#1C211A; --ink:#E6E9DE; --ink-soft:#A5AD9A; --line:#333B2E;
+  --moss:#9EC386; --moss-soft:#25301F; --rust:#E39276; --rust-soft:#3A2620; --ochre:#D8A852; color-scheme:dark}
+body.animal{--acc:var(--rust);--acc-soft:var(--rust-soft)}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.7;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px}
+.wrap{max-width:1120px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;text-wrap:balance;margin:0;line-height:1.3}
+p{margin:0}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+
+header{padding-block:40px 20px;display:grid;gap:10px}
+.eyebrow{font-size:12.5px;letter-spacing:.14em;color:var(--acc);font-weight:600}
+h1{font-size:clamp(30px,5vw,46px)}
+.lede{color:var(--ink-soft);max-width:64ch}
+
+.books{display:flex;gap:0;border-bottom:1.5px solid var(--ink);margin-top:8px}
+.books button{border:1.5px solid transparent;border-bottom:0;background:none;padding:10px 22px 8px;cursor:pointer;font-family:var(--f-display);font-size:19px;font-weight:700;color:var(--ink-soft);border-radius:8px 8px 0 0;margin-bottom:-1.5px}
+.books button small{font-family:var(--f-body);font-weight:400;font-size:12px;margin-left:6px}
+.books button[aria-selected="true"]{border-color:var(--ink);background:var(--paper);color:var(--ink)}
+.books button[data-b="plant"][aria-selected="true"]{color:var(--moss)}
+.books button[data-b="animal"][aria-selected="true"]{color:var(--rust)}
+
+.index{display:flex;gap:10px;overflow-x:auto;padding-block:16px 14px;scrollbar-width:thin}
+.chip{flex:0 0 auto;display:grid;grid-template-columns:42px auto;align-items:center;gap:10px;padding:8px 14px 8px 8px;
+  background:var(--card);border:1px solid var(--line);border-radius:10px;cursor:pointer;text-align:left}
+.chip .thumb{width:42px;height:42px;border-radius:6px;background:#fff;overflow:hidden;display:grid;place-items:center}
+.chip .thumb img{width:100%;height:100%;object-fit:cover}
+.chip .thumb i{display:block;width:30px;height:30px;border-radius:50%}
+.chip b{display:block;font-family:var(--f-display);font-size:15px;line-height:1.2}
+.chip small{color:var(--ink-soft);font-size:12px;font-variant-numeric:tabular-nums}
+.chip[aria-pressed="true"]{border-color:var(--acc);background:var(--acc-soft)}
+
+.sheet{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:860px){.sheet{grid-template-columns:1fr}}
+.plateCol{display:grid;gap:14px;position:sticky;top:12px}
+@media (max-width:860px){.plateCol{position:static}}
+.frame{position:relative;background:#fff;border:1px solid var(--line);border-radius:4px;aspect-ratio:1/1;max-width:100%;overflow:hidden}
+.frame img{width:100%;height:100%;object-fit:contain;display:block}
+.frame canvas{width:100%;height:100%;display:block}
+.empty{position:absolute;inset:auto 0 0 0;padding:14px 16px;background:linear-gradient(transparent,rgba(255,255,255,.96) 35%);color:#3a3d35;font-size:13.5px;line-height:1.55}
+.empty b{font-family:var(--f-display);font-size:16px;color:#23261f;display:block}
+.label{position:absolute;right:12px;top:12px;background:rgba(255,255,255,.94);color:#23261f;border:1px solid #5a6152;padding:5px 10px;font-size:11.5px;line-height:1.45}
+.label .no{font-variant-numeric:tabular-nums;color:#9A6A17;font-weight:600;letter-spacing:.06em}
+.label .sci{font-family:var(--f-latin);font-style:italic;font-size:13.5px}
+.edit{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;color:var(--ink-soft)}
+.btn{border:1px solid var(--acc);background:var(--acc);color:var(--card);border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:600;font-size:14px}
+.btn.ghost{background:none;color:var(--acc)}
+.btn:disabled{opacity:.5;cursor:wait}
+
+.palette h3{font-size:16px;margin-bottom:6px}
+.pencils{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:4px 14px;list-style:none;margin:0;padding:0}
+.pencils li{display:grid;gap:0}
+.pencils svg{width:100%;max-width:150px;height:auto}
+.pencils span{font-size:12.5px;color:var(--ink-soft);margin-top:-2px}
+.pencils span b{color:var(--ink);font-weight:600;margin-right:4px}
+
+.notesCol{display:grid;gap:22px;min-width:0}
+.title h2{font-size:clamp(28px,4vw,36px)}
+.title .sci{font-family:var(--f-latin);font-style:italic;font-size:20px;color:var(--ink-soft)}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-block:1px solid var(--line);margin:12px 0 0}
+.facts div{padding:9px 10px 9px 0;min-width:0}
+.facts div+div{padding-left:12px;border-left:1px solid var(--line)}
+.facts dt{font-size:11.5px;letter-spacing:.08em;color:var(--ink-soft)}
+.facts dd{margin:0;font-weight:600;font-size:14px}
+.block h3{font-size:18px;margin-bottom:8px;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.block h3 small{font-family:var(--f-body);font-weight:400;font-size:12.5px;color:var(--ink-soft)}
+dl.obs{margin:0;display:grid;gap:8px}
+dl.obs > div{display:grid;grid-template-columns:5.2em 1fr;gap:10px}
+dl.obs dt{font-weight:600;color:var(--acc)}
+dl.obs dd{margin:0}
+ol.steps{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ol.steps li{display:grid;grid-template-columns:30px 1fr;gap:10px}
+.num{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--acc);color:var(--acc);display:grid;place-items:center;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;margin-top:2px}
+ol.steps b{display:block}
+.dots{display:inline-flex;gap:3px;margin-left:6px;vertical-align:middle}
+.dots i{width:11px;height:11px;border-radius:50%;border:1px solid rgba(0,0,0,.25)}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:520px){.duo{grid-template-columns:1fr}}
+.note{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:14.5px}
+.note h4{margin:0 0 4px;font-size:13px;letter-spacing:.06em}
+.note.tip h4{color:var(--moss)} .note.warn h4{color:var(--ochre)}
+.note ul{margin:0;padding-left:1.1em}
+.ask{font-family:var(--f-hand);font-size:23px;line-height:1.35;border-left:3px solid var(--ochre);padding-left:12px}
+.care{font-size:13.5px;color:var(--ink-soft);border:1px dashed var(--line);border-radius:8px;padding:8px 12px}
+details.prompt{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+details.prompt summary{cursor:pointer;font-weight:600;font-size:14px}
+.ptext{font-size:13.5px;background:var(--paper);border-radius:6px;padding:10px 12px;margin:8px 0;white-space:pre-wrap;user-select:all}
+
+section.part{margin-top:64px;display:grid;gap:18px}
+.partHead{display:grid;gap:6px;border-top:1.5px solid var(--ink);padding-top:14px}
+.partHead h2{font-size:26px}
+.partHead p{color:var(--ink-soft);max-width:66ch}
+.tech{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+.tech figure{margin:0;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px;display:grid;gap:8px;align-content:start}
+.tech canvas{width:100%;height:auto;border-radius:4px;display:block}
+.tech figcaption b{display:block;font-family:var(--f-display);font-size:16px;color:var(--ink)}
+.tech figcaption{font-size:13.5px;color:var(--ink-soft);line-height:1.55}
+.order{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border:1px solid var(--line);border-radius:8px;background:var(--card);overflow:hidden}
+.order div{padding:12px 14px;min-width:0}
+.order div+div{border-left:1px solid var(--line)}
+.order b{display:block;font-family:var(--f-display);font-size:16px}
+.order small{display:block;color:var(--ink-soft);font-size:13px;line-height:1.55}
+.order .k{font-size:11.5px;letter-spacing:.08em;color:var(--acc);font-weight:600}
+@media (max-width:700px){.order{grid-template-columns:1fr 1fr}.order div:nth-child(3){border-left:0}.order div:nth-child(n+3){border-top:1px solid var(--line)}}
+
+.plist{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.pitem{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:grid;gap:6px;min-width:0}
+.pitem header{padding:0;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pitem h3{font-size:16px}
+.pitem .tagc{font-size:11.5px;color:var(--ink-soft)}
+.pitem p{font-size:13.5px;color:var(--ink-soft);line-height:1.6}
+.copy{border:1px solid var(--line);background:var(--paper);border-radius:6px;padding:4px 10px;font-size:12.5px;cursor:pointer;white-space:nowrap}
+.copy.ok{border-color:var(--moss);color:var(--moss)}
+.howto{display:grid;gap:6px;margin:0;padding-left:1.2em}
+
+.ws{background:#fff;color:#1d1f1a;border:1px solid var(--line);max-width:794px;width:100%;margin:0 auto;padding:36px 40px;font-size:13.5px;line-height:1.6}
+.ws h3{font-family:var(--f-display);font-size:22px;text-align:center}
+.ws .sub{text-align:center;color:#555;font-size:12.5px;margin-top:2px}
+.ws .who{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:18px}
+.ws .f{border-bottom:1px solid #333;padding:2px 0;min-height:28px;font-size:12px;color:#555;display:flex;gap:6px;align-items:end}
+.ws .f b{color:#1d1f1a;font-size:13.5px;font-weight:600}
+.ws .meta{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:10px;margin-top:10px}
+.ws .draw{margin-top:16px;border:1.2px solid #333;aspect-ratio:1.3/1;position:relative;max-width:100%}
+.ws .draw.g{background-image:linear-gradient(#e7e9e3 1px,transparent 1px),linear-gradient(90deg,#e7e9e3 1px,transparent 1px);background-size:37.8px 37.8px}
+.ws .tag{position:absolute;right:10px;bottom:10px;border:1px solid #333;background:#fff;padding:6px 10px;font-size:11px;line-height:1.7;width:180px}
+.ws .tag div{border-bottom:1px dotted #888}
+.ws .swatch{display:grid;grid-template-columns:auto repeat(8,1fr);gap:6px;align-items:center;margin-top:12px;font-size:12px}
+.ws .swatch i{display:block;height:26px;border:1px solid #888;border-radius:3px}
+.ws .q{margin-top:12px;display:grid;gap:6px}
+.ws .q p{font-weight:600}
+.ws .lines{height:44px;background-image:linear-gradient(transparent 21px,#999 22px);background-size:100% 22px}
+.ws table{width:100%;border-collapse:collapse;margin-top:12px;font-size:12.5px}
+.ws td,.ws th{border:1px solid #888;padding:4px 8px}
+.ws th{background:#f1f3ee;font-weight:600}
+.ws td.c{text-align:center;width:52px;color:#777}
+.wsScroll{overflow-x:auto}
+.toggles{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-size:13.5px;color:var(--ink-soft)}
+.toggles label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+.toggles input{accent-color:var(--acc);width:16px;height:16px}
+footer{margin-top:56px;color:var(--ink-soft);font-size:13px;border-top:1px solid var(--line);padding-top:14px}
+
+@media print{
+  @page{size:A4;margin:12mm}
+  body{background:#fff;padding:0}
+  body *{visibility:hidden}
+  #ws,#ws *{visibility:visible}
+  #ws{position:absolute;left:0;top:0;border:0;padding:0;max-width:none}
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">중학교 미술 · 관찰 표현 · 색연필 세밀화</div>
+    <h1>색연필 세밀화 도감</h1>
+    <p class="lede">색연필은 한 번에 진하게 칠하지 않고, <b>연한 색부터 여러 번 겹쳐</b> 깊은 색을 만드는 재료예요. 식물 6종, 동물 6종의 관찰 포인트와 쓸 색연필, 칠하는 순서를 정리했어요. 권을 고르고 표본을 눌러 보세요.</p>
+    <div class="books" role="tablist" aria-label="도감 권">
+      <button role="tab" data-b="plant" aria-selected="true">식물 편<small>6종</small></button>
+      <button role="tab" data-b="animal" aria-selected="false">동물 편<small>6종</small></button>
+    </div>
+  </header>
+
+  <nav class="index" id="index" aria-label="표본 목록"></nav>
+
+  <main class="sheet">
+    <div class="plateCol">
+      <div class="frame" id="frame"></div>
+      <div class="edit" id="edit" hidden>
+        <input type="file" id="upFile" accept="image/*" hidden>
+        <button class="btn" id="upBtn" type="button">GPT 그림 넣기</button>
+        <button class="btn ghost" id="rmBtn" type="button" hidden>그림 빼기</button>
+        <span id="upMsg">편집 권한이 있는 분에게만 보이는 단추예요.</span>
+      </div>
+      <div class="palette"><h3>이 표본에 쓰는 색연필</h3><ul class="pencils" id="pencils"></ul></div>
+    </div>
+    <div class="notesCol" id="notes"></div>
+  </main>
+
+  <section class="part" id="technique">
+    <div class="partHead">
+      <h2>색연필 세밀화 기법</h2>
+      <p>색연필은 물감처럼 섞어 칠하지 않아요. 종이 위에 <b>얇은 층을 차곡차곡 쌓아서</b> 색을 섞고 어둡게 만들어요. 연습장에 아래 다섯 가지를 한 칸씩 해 본 뒤 시작해요.</p>
+    </div>
+    <div class="tech" id="tech"></div>
+    <div class="order">
+      <div><span class="k">1단계</span><b>밑색</b><small>가장 밝은 색을 아주 연하게 전체에. 하이라이트 자리는 비워요.</small></div>
+      <div><span class="k">2단계</span><b>중간색</b><small>대상의 고유한 색을 결 방향으로 두세 번 겹쳐요.</small></div>
+      <div><span class="k">3단계</span><b>그림자·진한 색</b><small>빛 반대쪽과 틈에 진한 색을 얹어요. 검정은 아껴요.</small></div>
+      <div><span class="k">4단계</span><b>마무리</b><small>뾰족한 연필로 무늬·결을 넣고, 필요한 곳만 버니싱해요.</small></div>
+    </div>
+  </section>
+
+  <section class="part" id="prompts">
+    <div class="partHead">
+      <h2>GPT 그림 만들기 프롬프트 <small style="font-size:14px;color:var(--ink-soft);font-family:var(--f-body);font-weight:400">선생님용</small></h2>
+      <p>아래 문장을 복사해 ChatGPT 이미지 만들기에 붙여 넣으면, 이 도감에 맞는 색연필 세밀화 예시 그림을 만들 수 있어요. 만든 그림은 위쪽 표본 액자의 <b>GPT 그림 넣기</b> 단추로 올리면 학생들에게도 보여요.</p>
+    </div>
+    <ol class="howto">
+      <li>12장을 <b>같은 대화창</b>에서 이어서 만들면 그림체가 비슷하게 맞춰져요.</li>
+      <li>결과가 사진처럼 나오면 “색연필 결이 더 보이게, 종이 질감이 보이게 다시 그려 줘”라고 요청해 보세요.</li>
+      <li>정사각형 그림이 액자에 가장 잘 맞아요. 다른 비율도 잘리지 않고 들어가요.</li>
+    </ol>
+    <div class="plist" id="plist"></div>
+  </section>
+
+  <section class="part" id="worksheet">
+    <div class="partHead">
+      <h2>색연필 세밀화 활동지</h2>
+      <p>관찰 대상과 색연필 칸은 위에서 고른 표본에 맞춰 자동으로 바뀌어요. 이 파일을 크롬이나 엣지에서 직접 열고 <b>Ctrl + P</b>를 누르면 활동지만 A4 한 장으로 인쇄돼요.</p>
+    </div>
+    <div class="toggles">
+      <label><input type="checkbox" id="wsGrid" checked> 그리기 칸에 1cm 격자 넣기</label>
+      <label><input type="checkbox" id="wsName" checked> 관찰 대상 이름 미리 채우기</label>
+    </div>
+    <div class="wsScroll">
+    <div class="ws" id="ws">
+      <h3>색연필 세밀화 관찰 활동지</h3>
+      <p class="sub">연하게 시작해서 겹겹이, 보이는 그대로</p>
+      <div class="who"><div class="f">학년</div><div class="f">반</div><div class="f">번호</div><div class="f">이름</div></div>
+      <div class="meta">
+        <div class="f">관찰 대상 <b id="wsTarget"></b></div>
+        <div class="f">관찰한 날</div>
+        <div class="f">실제 크기 가로 &nbsp;&nbsp;&nbsp;cm · 세로 &nbsp;&nbsp;&nbsp;cm</div>
+      </div>
+      <div class="draw g" id="wsDraw"><div class="tag"><div>표본 이름:</div><div>관찰한 곳:</div><div>관찰한 날:</div><div>그린 사람:</div></div></div>
+      <div class="swatch" id="wsSw"><span>내가 쓴 색연필<br>(살짝 칠해 보기)</span></div>
+      <div class="q">
+        <p>1. 색 찾기: 대상에서 찾은 색을 모두 적어 보세요. 그림자 속에는 어떤 색이 있었나요?</p><div class="lines"></div>
+        <p>2. 질감: 매끈한 곳, 거친 곳, 반짝이는 곳은 어디였고 어떻게 표현했나요?</p><div class="lines"></div>
+        <p>3. 새로 발견한 점: 그리면서 처음 알게 된 것은 무엇인가요?</p><div class="lines"></div>
+      </div>
+      <table>
+        <tr><th>스스로 점검하기</th><th>잘함</th><th>보통</th><th>노력</th></tr>
+        <tr><td>밝은 색에서 진한 색 순서로 겹쳐 칠했다.</td><td class="c">○</td><td class="c">○</td><td class="c">○</td></tr>
+        <tr><td>한 부분에 세 가지 이상의 색을 겹쳐 실제 색에 가깝게 만들었다.</td><td class="c">○</td><td class="c">○</td><td class="c">○</td></tr>
+        <tr><td>하이라이트(가장 밝은 곳)를 종이 색으로 남겼다.</td><td class="c">○</td><td class="c">○</td><td class="c">○</td></tr>
+        <tr><td>끝까지 대상을 보면서 비례와 무늬를 맞추었다.</td><td class="c">○</td><td class="c">○</td><td class="c">○</td></tr>
+      </table>
+    </div>
+    </div>
+  </section>
+
+  <footer>그림이 들어가기 전에는 액자에 그 표본의 색연필 색 견본이 대신 보여요. 살아 있는 곤충·개구리·달팽이는 관찰한 뒤 원래 있던 곳에 놓아 주고, 손을 씻어요. 예시 그림은 참고용이며, 학생들은 눈앞의 실물이나 사진을 보고 그려요.</footer>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const STYLE='색연필로 그린 세밀화(보태니컬 일러스트) 스타일, 흰 종이 배경, 대상 하나만 화면 가운데, 실제 색과 비례 그대로, 색연필 결과 종이 질감이 보이게 여러 번 겹쳐 칠한 느낌, 부드러운 그림자, 글자·테두리·배경 장식 없이, 정사각형 그림';
+
+const P=(name,hex)=>({name,hex});
+const SPEC=[
+/* ---------------- 식물 ---------------- */
+{id:'maple',book:'plant',no:'P-01',name:'단풍잎',sci:'Acer palmatum',family:'단풍나무과',when:'10–11월',size:'잎 폭 6–10 cm',level:'★★☆',
+ pal:[P('레몬옐로','#F2D43A'),P('주황','#F08A24'),P('빨강','#D7322B'),P('크림슨','#9E1B2F'),P('고동색','#6B3A22'),P('올리브그린','#7A8A2E')],
+ obs:[['색 변화','한 장 안에서도 잎자루 쪽은 노랗거나 초록빛이고, 갈래 끝으로 갈수록 붉어져요.'],['잎맥','주맥은 주변보다 밝은 선으로 보여요. 잎맥을 따라 색이 달라지기도 해요.'],['가장자리','작은 톱니 위에 더 작은 톱니가 있는 겹톱니예요.'],['흔적','벌레 먹은 구멍과 갈색 반점도 그대로 관찰해서 그려요.']],
+ steps:[['밑색',[0],'잎 전체를 레몬옐로로 아주 연하게 칠해요. 잎맥 자리는 비워 두어요.'],['중간색',[1,2],'갈래 끝에서 안쪽으로 주황, 빨강을 겹쳐 색이 자연스럽게 이어지게 해요.'],['그림자·진한 색',[3,4],'갈래 사이 오목한 곳과 잎맥 옆에 크림슨, 반점에 고동색을 얹어요.'],['마무리',[5],'잎자루 쪽에 올리브그린을 살짝, 톱니는 뾰족하게 깎은 연필로 다듬어요.']],
+ tip:['칠하기 전에 다 쓴 볼펜으로 잎맥을 눌러 홈을 내면(인덴팅) 하얀 잎맥이 깔끔하게 남아요.','빨강 위에 노랑을 다시 얹으면 색이 더 맑고 따뜻해져요.'],
+ miss:['빨강 한 색으로만 칠하기','처음부터 세게 눌러 종이 결이 막혀 더 겹칠 수 없게 되기'],
+ ask:'단풍잎 한 장에서 몇 가지 색을 찾을 수 있나요? 색이 바뀌는 경계를 손가락으로 따라가 보세요.',
+ prompt:'붉게 물든 단풍나무 잎 한 장, 잎자루 쪽은 노랗고 갈래 끝은 붉게 이어지는 색 변화, 밝게 보이는 잎맥과 겹톱니 가장자리'},
+{id:'ginkgo',book:'plant',no:'P-02',name:'은행잎',sci:'Ginkgo biloba',family:'은행나무과',when:'10–11월',size:'잎몸 폭 5–8 cm',level:'★☆☆',
+ pal:[P('레몬옐로','#F4DC4B'),P('노랑','#F2B705'),P('황토색','#C98B1E'),P('연두','#A9C23F'),P('고동색','#6B4A22'),P('회색','#8A8A84')],
+ obs:[['여러 노랑','같은 노랑이 아니에요. 레몬빛, 달걀노른자빛, 황토빛 노랑이 섞여 있어요.'],['잎맥 결','잎자루에서 부챗살처럼 퍼지는 가는 잎맥이 결을 만들어요.'],['잎자루 쪽','잎자루 근처에는 연두 기운이 남아 있는 경우가 많아요.'],['마른 가장자리','가장자리가 갈색으로 말라 있는 곳을 찾아보세요.']],
+ steps:[['밑색',[0],'레몬옐로를 잎맥 방향(잎자루에서 바깥쪽)으로 결을 따라 칠해요.'],['중간색',[1,2],'노랑을 겹치고, 잎자루 쪽과 잎이 오목한 곳은 황토색으로 진하게 해요.'],['그림자·진한 색',[3,4],'잎자루 근처에 연두를 살짝, 접힌 곳에 고동색을 아주 조금 얹어요.'],['마무리',[2,5],'뾰족한 황토색으로 잎맥 몇 가닥만 긋고, 마른 가장자리는 고동·회색으로.']],
+ tip:['칠하는 방향을 잎맥 방향과 맞추면 결이 저절로 생겨요.','노랑은 흰 종이가 비쳐야 맑아요. 세게 누르는 버니싱은 맨 마지막에만 해요.'],
+ miss:['노랑을 어둡게 하려고 검정을 써서 색이 탁해지기','잎맥을 모두 진한 선으로 그리기'],
+ ask:'노랑을 어둡게 하려면 어떤 색을 겹치면 좋을까요? 회색과 황토색을 각각 겹쳐 보고 비교해 보세요.',
+ prompt:'노랗게 물든 은행잎 한 장, 부챗살처럼 퍼지는 가는 잎맥이 섬세하게 보이고 가장자리가 살짝 갈색으로 마른 모습'},
+{id:'persimmon',book:'plant',no:'P-03',name:'감',sci:'Diospyros kaki',family:'감나무과',when:'10–11월',size:'지름 6–8 cm',level:'★★★',
+ pal:[P('노랑','#F2B705'),P('주황','#F07C1F'),P('버밀리언','#E2482A'),P('고동색','#5E3A1E'),P('올리브그린','#6F7D2C'),P('보라','#6B5B95')],
+ obs:[['둥근 부피','공 모양이라 빛 받는 쪽은 밝고 반짝이며, 반대쪽으로 갈수록 어두워져요.'],['꼭지','네 장의 꽃받침이 십자 모양으로 붙어 있고, 끝이 말라 갈색이에요.'],['표면','얇은 흰 가루가 덮인 곳은 색이 살짝 뿌옇게 보여요.'],['바닥 그림자','감이 놓인 바닥에 생기는 그림자가 무게감을 만들어요.']],
+ steps:[['밑색',[0],'하이라이트 자리를 비우고 전체를 노랑으로 연하게 칠해요.'],['중간색',[1],'주황을 감의 둥근 면을 따라 곡선 결로 두세 번 겹쳐요.'],['그림자·진한 색',[2,3,5],'빛 반대쪽 아래에 버밀리언, 가장 어두운 곳에 고동색을 조금. 바닥 그림자는 보라로.'],['마무리',[4,3],'꼭지를 올리브그린과 고동색으로 그리고, 하이라이트 경계를 노랑으로 부드럽게 이어요.']],
+ tip:['공 모양은 둥근 결로 칠하면 입체감이 쉽게 살아나요.','그림자에 검정 대신 보라나 파랑을 살짝 쓰면 색이 탁해지지 않아요.'],
+ miss:['하이라이트를 흰 색연필로 칠해서 만들려고 하기 (종이를 남기는 게 가장 밝아요)','바닥 그림자를 빼먹어 감이 떠 보이기'],
+ ask:'감의 그림자 속에도 색이 있을까요? 그림자를 자세히 보고 어떤 색이 섞여 있는지 찾아보세요.',
+ prompt:'잘 익은 주황색 감 한 개와 마른 꼭지, 왼쪽 위에서 빛을 받아 반짝이는 부분과 바닥 그림자가 있는 모습'},
+{id:'acorn',book:'plant',no:'P-04',name:'도토리',sci:'Quercus spp.',family:'참나무과',when:'9–10월',size:'길이 1.5–2.5 cm',level:'★★☆',
+ pal:[P('크림','#EBD9B0'),P('황토색','#C08A3E'),P('갈색','#8A5A2B'),P('고동색','#5A3820'),P('회갈색','#A39882'),P('올리브그린','#7D7A3A')],
+ obs:[['열매','반질반질 광택이 있고, 세로로 아주 가는 줄무늬가 있어요.'],['깍정이','모자처럼 생긴 깍정이는 작은 비늘이 기와처럼 덮여 거칠어요.'],['끝','열매 맨 끝에 뾰족한 점이 있어요.'],['대비','매끈한 열매와 거친 깍정이의 질감 차이가 이 표본의 핵심이에요.']],
+ steps:[['밑색',[0,4],'열매는 크림(하이라이트 비움), 깍정이는 회갈색으로 연하게 칠해요.'],['중간색',[1,2],'열매에 황토색과 갈색을 세로 결로 겹쳐요.'],['그림자·진한 색',[3],'깍정이 바로 아래 그림자 띠, 열매의 빛 반대쪽, 비늘 사이 틈을 고동색으로.'],['마무리',[0,5],'열매는 크림으로 세게 문질러(버니싱) 광택을, 깍정이는 점찍기로 거칠게 남겨요.']],
+ tip:['광택은 버니싱으로, 거친 질감은 버니싱하지 않고 종이 결을 남겨서 표현해요.','실제보다 3–5배 크게 그리면 깍정이 비늘을 그리기 쉬워요.'],
+ miss:['열매와 깍정이를 같은 방식으로 칠해서 질감 차이가 안 보이기','갈색 한 가지로만 칠하기'],
+ ask:'매끈한 것과 거친 것을 색연필로 어떻게 다르게 표현할 수 있을까요? 같은 갈색으로 두 가지를 실험해 보세요.',
+ prompt:'갈색 도토리 한 개를 크게 확대한 모습, 반짝이는 매끈한 열매와 작은 비늘이 덮인 거친 깍정이(모자)가 대비되는'},
+{id:'pinecone',book:'plant',no:'P-05',name:'솔방울',sci:'Pinus densiflora',family:'소나무과',when:'사계절',size:'길이 4–5 cm',level:'★★★',
+ pal:[P('크림','#E8D7B4'),P('황토색','#B98B4E'),P('갈색','#8C5A2E'),P('고동색','#4E3220'),P('회갈색','#9C8F7A'),P('검정','#2A2522')],
+ obs:[['나선','비늘 조각(실편)이 두 방향의 나선으로 돌아가며 붙어 있어요.'],['밝고 어두움','비늘 끝은 밝고, 비늘 사이 틈은 아주 어두워요.'],['비늘 끝','비늘 끝 마름모 가운데에 회색빛 작은 돌기가 있어요.'],['가장자리','옆쪽 비늘은 좁고 납작하게 보여요.']],
+ steps:[['밑색',[1],'HB 연필로 나선 안내선을 연하게 그은 뒤, 전체를 황토색으로 칠해요.'],['중간색',[2],'비늘마다 아래쪽 절반을 갈색으로 진하게 해요.'],['그림자·진한 색',[3,5],'비늘 사이 틈을 고동색으로 채우고, 가장 깊은 곳에만 검정을 조금.'],['마무리',[0,4],'비늘 끝을 크림·회갈색으로 밝게 얹고 돌기를 작게 표시해요.']],
+ tip:['가장 어두운 틈을 먼저 정하면 명암 단계가 분명해져요.','비늘을 하나씩 다 그리기 전에 나선 안내선부터 그어요.'],
+ miss:['비늘 전체를 같은 갈색으로 칠하기','검정을 너무 일찍, 너무 넓게 쓰기'],
+ ask:'비늘 하나를 돋보기로 확대하면 몇 가지 색이 보이나요?',
+ prompt:'활짝 벌어진 소나무 솔방울 한 개, 비늘 조각이 나선으로 배열되고 비늘 끝은 밝고 틈의 그림자는 깊은 모습'},
+{id:'camellia',book:'plant',no:'P-06',name:'동백꽃',sci:'Camellia japonica',family:'차나무과',when:'12–4월',size:'꽃 지름 5–7 cm',level:'★★★',
+ pal:[P('분홍','#F08C9B'),P('빨강','#D2232A'),P('크림슨','#9B1B30'),P('노랑','#F5C518'),P('연두','#9CC15A'),P('진초록','#2F5D3A')],
+ obs:[['꽃잎','5–7장의 꽃잎이 겹쳐 컵 모양을 이루고, 세로로 가는 결이 있어요.'],['수술','가운데 노란 수술이 원통처럼 뭉쳐 있어요.'],['잎','두껍고 반질반질해서 빛이 하얗게 반사돼요.'],['겹침','꽃잎이 겹친 곳마다 그림자가 생겨요.']],
+ steps:[['밑색',[0,3],'꽃잎은 분홍으로 연하게, 수술은 노랑으로 칠해요.'],['중간색',[1],'꽃잎 바깥쪽에서 안쪽으로 빨강을 겹치며, 꽃잎 결 방향으로 칠해요.'],['그림자·진한 색',[2],'꽃잎이 겹친 곳과 수술 아래에 크림슨을 얹어요.'],['마무리',[4,5],'잎은 연두 위에 진초록을 겹치고 광택 자리를 비워요. 수술 끝은 점으로 찍어요.']],
+ tip:['빨강의 그림자는 검정이 아니라 크림슨이나 보라로 만들어요.','수술은 작은 점과 짧은 선을 모아서 표현해요.'],
+ miss:['꽃잎마다 테두리를 진하게 둘러 오려 붙인 것처럼 보이기','빨강 한 가지로 평평하게 칠하기'],
+ ask:'동백꽃은 겨울에 피어요. 추운 계절에 피는 꽃의 꽃잎과 잎에는 어떤 특징이 있을까요?',
+ prompt:'붉은 동백꽃 한 송이와 반짝이는 짙은 초록 잎 두 장, 가운데 노란 수술 뭉치가 선명하고 꽃잎이 겹친 그림자가 보이는'},
+/* ---------------- 동물 ---------------- */
+{id:'swallowtail',book:'animal',no:'A-01',name:'호랑나비',sci:'Papilio xuthus',family:'호랑나비과',when:'4–9월',size:'날개 편 길이 7–9 cm',level:'★★★',
+ pal:[P('크림','#F1E3A6'),P('레몬옐로','#F3D94A'),P('회색','#7E7C78'),P('검정','#1F1D1B'),P('파랑','#3B6FB6'),P('주황','#E8742A')],
+ obs:[['대칭','몸통을 가운데 두고 왼쪽과 오른쪽 날개 무늬가 똑같아요.'],['무늬','노란 바탕에 검은 줄무늬와 날개맥이 있어요.'],['뒷날개','꼬리 모양 돌기, 파란 점들, 주황색 눈 모양 무늬가 있어요.'],['비늘가루','날개는 작은 비늘가루로 덮여 있어 살짝 부드러운 결이 보여요.']],
+ steps:[['밑색',[0,1],'연필로 몸 중심선과 대칭 안내선을 긋고, 날개를 크림·레몬옐로로 칠해요.'],['중간색',[3],'날개맥을 따라 검은 무늬를 가장자리부터 칠해요. 노랑 위로 번지지 않게 조심!'],['그림자·진한 색',[4,5,2],'뒷날개의 파란 점과 주황 눈무늬, 몸통의 회색을 넣어요.'],['마무리',[3,2],'더듬이·다리를 가늘게 긋고, 검정 위에 회색을 얹어 비늘가루 결을 살려요.']],
+ tip:['왼쪽, 오른쪽을 번갈아 칠하면 대칭이 잘 맞아요.','검정을 칠한 뒤에는 손 아래에 종이를 받쳐 노랑이 더러워지지 않게 해요.'],
+ miss:['날개를 평평한 도형처럼 단순하게 그리기','노랑보다 검정을 먼저 칠해 번지기'],
+ ask:'날개 무늬는 왜 좌우가 같을까요? 왼쪽과 오른쪽을 한 칸씩 비교하며 그려 보세요.',
+ prompt:'날개를 활짝 편 호랑나비 한 마리를 위에서 본 모습, 좌우 대칭, 노란 바탕에 검은 줄무늬와 날개맥, 뒷날개의 파란 점과 주황색 눈무늬'},
+{id:'ladybug',book:'animal',no:'A-02',name:'칠성무당벌레',sci:'Coccinella septempunctata',family:'무당벌레과',when:'4–10월',size:'몸길이 5–8 mm',level:'★☆☆',
+ pal:[P('주황','#E9662A'),P('빨강','#D8262E'),P('크림슨','#95202C'),P('검정','#1E1C1B'),P('회색','#8C8A86'),P('흰색','#FFFFFF')],
+ obs:[['모양','등이 반구처럼 볼록해요.'],['점','검은 점이 7개예요. 양쪽에 3개씩, 가운데 앞쪽에 1개.'],['머리','검은 머리 양옆에 흰 무늬가 있어요.'],['반짝임','등이 매끈해서 하얀 반사광이 생겨요.']],
+ steps:[['밑색',[0],'반사광 자리를 비우고 등 전체를 주황으로 칠해요.'],['중간색',[1],'빨강을 둥근 결로 겹쳐요. 가운데는 밝게, 가장자리는 진하게.'],['그림자·진한 색',[2,3],'등 가장자리에 크림슨, 그리고 검은 점 7개를 칠해요.'],['마무리',[3,5,4],'머리·다리·더듬이를 검정으로, 흰 무늬를 남기고, 등은 버니싱해 반짝이게.']],
+ tip:['아주 작으니 실제보다 5배 이상 크게 그려요.','점은 동그라미가 아니라 둥근 등을 따라 휘어진 타원이에요.'],
+ miss:['점을 모두 같은 크기의 동그라미로 그리기','반사광이 없어 플라스틱 장난감처럼 평평해 보이기'],
+ ask:'등 가장자리로 갈수록 점의 모양이 어떻게 변하나요? 왜 그렇게 보일까요?',
+ prompt:'칠성무당벌레 한 마리를 비스듬히 위에서 본 모습을 크게 확대, 반짝이는 빨간 등과 검은 점 7개, 머리의 흰 무늬'},
+{id:'stagbeetle',book:'animal',no:'A-03',name:'넓적사슴벌레',sci:'Dorcus titanus',family:'사슴벌레과',when:'6–8월',size:'몸길이 3–8 cm',level:'★★★',
+ pal:[P('고동색','#4A2E1E'),P('적갈색','#6E3524'),P('남색','#2C3550'),P('검정','#1C1A19'),P('회색','#8A8682'),P('흰색','#FFFFFF')],
+ obs:[['큰턱','수컷은 사슴뿔처럼 생긴 큰턱이 있고 안쪽에 작은 이빨이 있어요.'],['세 부분','머리, 가슴, 딱지날개 세 부분으로 나뉘어요.'],['다리','다리는 6개, 마디마다 꺾이고 가는 털과 가시가 있어요.'],['반사','검은 몸에도 빛을 받는 곳은 회색·흰색으로 반사돼요.']],
+ steps:[['밑색',[0],'연필로 대칭 안내선을 긋고, 반사 자리를 비운 채 몸 전체를 고동색으로 칠해요.'],['중간색',[1,3],'적갈색과 검정을 겹쳐 깊은 검은색을 만들어요.'],['그림자·진한 색',[2],'반사광 바로 옆에 남색을 얹으면 단단한 껍질 느낌이 나요.'],['마무리',[4,5],'다리 마디와 털을 가늘게, 반사광 가장자리는 흰색으로 버니싱해요.']],
+ tip:['검정은 검정 하나가 아니에요. 갈색과 남색을 겹치면 훨씬 깊어 보여요.','다리는 몸통에서 나오는 위치(가슴 아래 세 쌍)를 먼저 표시해요.'],
+ miss:['검정으로만 꽉 채워 덩어리처럼 보이기','다리 개수와 마디 방향 틀리기'],
+ ask:'검은 곤충의 몸에서 가장 밝은 곳은 어디이고, 어떤 색으로 보이나요?',
+ prompt:'넓적사슴벌레 수컷 한 마리를 위에서 본 모습, 큰턱과 여섯 다리가 좌우 대칭, 검은 등껍질에 비친 빛'},
+{id:'sparrow',book:'animal',no:'A-04',name:'참새',sci:'Passer montanus',family:'참새과',when:'사계절',size:'몸길이 약 14 cm',level:'★★★',
+ pal:[P('크림','#EADBC0'),P('황토색','#C9A26B'),P('갈색','#8A5A34'),P('적갈색','#9C4A2A'),P('회색','#9B9893'),P('검정','#222020')],
+ obs:[['머리','정수리는 적갈색, 뺨은 희고 가운데에 검은 점이 있어요.'],['날개','갈색·검정·흰색 깃털이 비늘처럼 겹쳐 줄무늬를 만들어요.'],['배','배와 가슴은 크림빛 회색이에요.'],['눈','작고 까만 눈에 하얀 반짝임이 있어 살아 있는 느낌을 줘요.']],
+ steps:[['밑색',[0,1],'연필로 머리·몸 두 개의 동그라미를 잡고, 크림과 황토색으로 바탕을 칠해요.'],['중간색',[2],'날개 깃털을 하나씩 갈색으로, 깃털이 난 방향으로 짧게 칠해요.'],['그림자·진한 색',[3,4],'정수리는 적갈색, 날개 아래와 배 옆은 회색으로 그늘을 넣어요.'],['마무리',[5],'눈은 흰 점을 남기고 검정으로, 뺨의 검은 점·부리·다리를 그려요.']],
+ tip:['털과 깃털은 짧은 선을 깃 방향으로 겹쳐 표현해요.','눈의 흰 반짝임 한 점이 그림 전체에 생명감을 줘요.'],
+ miss:['몸 윤곽선을 진하게 둘러 스티커처럼 보이기','눈 하이라이트를 빼먹기'],
+ ask:'참새의 깃털은 머리, 날개, 꼬리마다 길이와 방향이 어떻게 다를까요?',
+ prompt:'나뭇가지에 앉은 참새 한 마리 옆모습, 적갈색 정수리와 흰 뺨의 검은 점, 비늘처럼 겹친 날개 깃털 무늬, 눈의 반짝임'},
+{id:'treefrog',book:'animal',no:'A-05',name:'청개구리',sci:'Dryophytes japonicus',family:'청개구리과',when:'4–9월',size:'몸길이 2.5–4 cm',level:'★★☆',
+ pal:[P('노랑','#EAD64A'),P('연두','#9CCB4A'),P('초록','#4E9A3A'),P('진초록','#2D5E2F'),P('크림','#F0EBCF'),P('고동색','#5A4632')],
+ obs:[['피부','매끈하고 촉촉해서 작고 선명한 반사광이 생겨요.'],['눈','눈이 머리 위로 볼록 튀어나와 있고, 눈 옆으로 갈색 줄이 있어요.'],['발가락','발가락 끝이 둥글게 부풀어 있어요(흡반). 잎에 잘 붙기 위해서예요.'],['배','배는 크림색이고 오돌토돌해요.']],
+ steps:[['밑색',[0],'반사광 자리를 비우고 몸 전체에 노랑을 얇게 깔아요.'],['중간색',[1,2],'연두를 겹치고, 등 위쪽은 초록으로 한 번 더 겹쳐요.'],['그림자·진한 색',[3,5],'몸 아래와 다리 접힌 곳에 진초록, 눈 옆 줄은 고동색으로.'],['마무리',[4],'배는 크림으로, 눈동자는 검정 위에 흰 점을 남기고, 등은 버니싱해 촉촉하게.']],
+ tip:['초록 밑에 노랑을 깔면 생생한 연두가 나와요.','촉촉한 느낌은 작고 또렷한 반사광으로 만들어요.'],
+ miss:['초록 한 가지로만 칠하기','반사광을 너무 크게 남겨 비닐처럼 보이기'],
+ ask:'피부가 촉촉해 보이게 하려면 반사광을 어떤 모양과 크기로 남겨야 할까요?',
+ prompt:'초록 잎 위에 앉은 청개구리 한 마리, 촉촉하고 반짝이는 연두색 피부, 볼록한 눈과 눈 옆의 갈색 줄, 둥근 발가락 끝'},
+{id:'snail',book:'animal',no:'A-06',name:'달팽이',sci:'Acusta despecta',family:'달팽이과',when:'5–9월',size:'껍데기 지름 1.5–2 cm',level:'★★☆',
+ pal:[P('크림','#EBDDBF'),P('황토색','#C49A5C'),P('갈색','#8A5E36'),P('고동색','#5A3B24'),P('회색','#9A958C'),P('연보라','#B7A6C2')],
+ obs:[['나선','껍데기는 가운데에서 바깥으로 점점 넓어지는 나선이에요.'],['성장선','나선을 가로지르는 가는 줄이 자란 흔적이에요.'],['촉각','긴 촉각 한 쌍 끝에 눈이 있고, 아래에 짧은 촉각이 한 쌍 더 있어요.'],['몸','몸은 그물 같은 주름이 있고, 점액 때문에 반짝여요.']],
+ steps:[['밑색',[0,1],'연필로 나선 안내선을 긋고, 껍데기를 크림·황토색으로 칠해요.'],['중간색',[2],'나선 띠를 따라 갈색을 넣고, 성장선 방향으로 짧은 결을 겹쳐요.'],['그림자·진한 색',[3,4,5],'나선 안쪽 틈은 고동색, 몸 아래쪽은 회색과 연보라로 그늘을 넣어요.'],['마무리',[3],'촉각과 눈, 몸의 주름 무늬를 가늘게 그리고, 점액 반사광을 남겨요.']],
+ tip:['나선은 가운데부터 바깥으로, 한 바퀴마다 폭을 넓혀 가며 그려요.','몸의 그림자에 연보라를 쓰면 촉촉하고 말랑해 보여요.'],
+ miss:['나선을 동심원처럼 따로 떨어진 원으로 그리기','몸 아래 그림자를 빼먹어 떠 보이기'],
+ ask:'달팽이 껍데기는 어느 쪽으로 감겨 있나요? 여러 마리를 비교해 보세요.',
+ prompt:'잎 위를 기어가는 달팽이 한 마리 옆모습, 나선 껍데기의 갈색 띠와 가는 성장선, 촉각 끝의 눈, 촉촉하게 반짝이는 몸'}
+];
+
+/* ---------- 색연필 그리기(캔버스) ---------- */
+function rgba(hex,a){const n=parseInt(hex.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`}
+function strokes(ctx,x,y,w,h,o){
+  const r=rng(o.seed||1);ctx.save();ctx.beginPath();if(o.circle){ctx.arc(x+w/2,y+h/2,Math.min(w,h)/2,0,Math.PI*2)}else ctx.rect(x,y,w,h);ctx.clip();
+  const ang=(o.angle??-35)*Math.PI/180,dx=Math.cos(ang),dy=Math.sin(ang),n=o.n||400,L=o.len||40;
+  for(let i=0;i<n;i++){const px=x+r()*w,py=y+r()*h;const t=(px-x)/w;const k=o.fade?o.fade(t):1;if(r()>k)continue;
+    ctx.strokeStyle=rgba(o.color,(o.alpha||.22)*(.6+r()*.6));ctx.lineWidth=o.lw||1.3;const l=L*(.5+r()*.8);
+    ctx.beginPath();ctx.moveTo(px-dx*l/2,py-dy*l/2);ctx.lineTo(px+dx*l/2+(r()-.5)*2,py+dy*l/2+(r()-.5)*2);ctx.stroke()}
+  ctx.restore();
+}
+function grain(ctx,x,y,w,h,seed){const r=rng(seed||99);ctx.save();ctx.fillStyle='rgba(255,255,255,.55)';for(let i=0;i<w*h/30;i++){ctx.fillRect(x+r()*w,y+r()*h,1.2,1.2)}ctx.restore()}
+function paper(ctx,W,H){ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H)}
+
+function pencilSVG(hex,name){
+  const light=rgba(hex,.0);
+  return `<svg viewBox="0 0 150 22" aria-hidden="true"><rect x="1" y="4" width="104" height="14" rx="1.5" fill="${hex}" stroke="rgba(0,0,0,.25)" stroke-width=".6"/><rect x="1" y="4" width="104" height="4" fill="rgba(255,255,255,.28)"/><rect x="1" y="14" width="104" height="4" fill="rgba(0,0,0,.12)"/><path d="M105 4 L128 9.6 L128 12.4 L105 18 Z" fill="#E9CFA6" stroke="rgba(0,0,0,.25)" stroke-width=".6"/><path d="M121 7.9 L134 11 L121 14.1 Z" fill="${hex}" stroke="rgba(0,0,0,.25)" stroke-width=".5"/><text x="8" y="14.6" font-size="8" fill="${isLight(hex)?'#33302a':'#fff'}" font-family="IBM Plex Sans KR,sans-serif">${esc(name)}</text></svg>`;
+}
+function isLight(hex){const n=parseInt(hex.slice(1),16);return (.299*(n>>16&255)+.587*(n>>8&255)+.114*(n&255))>150}
+
+/* 그림이 없을 때 액자에 보이는 색 견본 */
+function placeholder(sp){
+  const c=document.createElement('canvas');c.width=900;c.height=900;const x=c.getContext('2d');paper(x,900,900);
+  sp.pal.forEach((p,i)=>{const col=i%3,row=Math.floor(i/3);const cx=110+col*240,cy=120+row*250;
+    strokes(x,cx,cy,200,190,{color:p.hex,n:900,len:46,alpha:p.hex==='#FFFFFF'?0:.26,seed:i+3,angle:-40,circle:true});
+    strokes(x,cx,cy,200,190,{color:p.hex,n:500,len:40,alpha:.18,seed:i+30,angle:30,circle:true,fade:t=>1-t*.8});grain(x,cx,cy,200,190,i);if(p.hex==='#FFFFFF'){x.strokeStyle='#c9ccc2';x.setLineDash([6,6]);x.lineWidth=2;x.beginPath();x.arc(cx+100,cy+95,93,0,Math.PI*2);x.stroke();x.setLineDash([])}
+    x.fillStyle='#55584f';x.font='500 26px "IBM Plex Sans KR",sans-serif';x.textAlign='center';x.fillText(p.name,cx+100,cy+222);});
+  return c;
+}
+
+/* ---------- 상태 ---------- */
+let book='plant',cur=SPEC[0];const imgs={};let assets=null,db=null;
+const idx=$('#index');
+function imgSrc(id){const d=imgs[id];return d&&/^[\w-]+$/.test(d.assetId||'')?'/_blob/'+d.assetId:null}
+
+function renderIndex(){
+  idx.innerHTML=SPEC.filter(s=>s.book===book).map(s=>{const src=imgSrc(s.id);
+    return `<button class="chip" data-id="${s.id}" aria-pressed="${s.id===cur.id}"><span class="thumb">${src?`<img src="${src}" alt="">`:`<i style="background:conic-gradient(${s.pal.map(p=>p.hex).join(',')})"></i>`}</span><span><b>${s.name}</b><small>${s.no} · ${s.level}</small></span></button>`}).join('');
+}
+idx.addEventListener('click',e=>{const b=e.target.closest('.chip');if(b)select(b.dataset.id,true)});
+document.querySelectorAll('.books button').forEach(b=>b.addEventListener('click',()=>{const first=SPEC.find(s=>s.book===b.dataset.b);select(first.id,true)}));
+
+function select(id,push){
+  cur=SPEC.find(s=>s.id===id)||SPEC[0];book=cur.book;
+  document.body.classList.toggle('animal',book==='animal');
+  document.querySelectorAll('.books button').forEach(b=>b.setAttribute('aria-selected',b.dataset.b===book));
+  renderIndex();renderFrame();renderNotes();updateSheet();
+  if(push&&location.hash!=='#'+cur.id){try{history.replaceState(null,'','#'+cur.id)}catch(e){location.hash=cur.id}}
+}
+function renderFrame(){
+  const fr=$('#frame');fr.innerHTML='';const src=imgSrc(cur.id);
+  if(src){const im=new Image();im.alt=cur.name+' 색연필 세밀화 예시';im.src=src;fr.appendChild(im)}
+  else{fr.appendChild(placeholder(cur));fr.insertAdjacentHTML('beforeend',`<div class="empty"><b>예시 그림이 들어갈 자리예요</b>그림이 들어오기 전에는 이 표본에 쓰는 색연필 색을 보여 줘요. 아래 「GPT 그림 만들기 프롬프트」로 만든 그림을 넣을 수 있어요.</div>`)}
+  fr.insertAdjacentHTML('beforeend',`<div class="label"><div class="no">표본 ${cur.no}</div><div><b>${cur.name}</b> · ${cur.family}</div><div class="sci">${cur.sci}</div></div>`);
+  $('#pencils').innerHTML=cur.pal.map(p=>`<li>${pencilSVG(p.hex,p.name)}</li>`).join('');
+  $('#rmBtn').hidden=!imgs[cur.id];$('#rmBtn').textContent='그림 빼기';rmArmed=false;
+  $('#upBtn').textContent=imgs[cur.id]?'GPT 그림 바꾸기':'GPT 그림 넣기';
+}
+const dots=ix=>`<span class="dots">${ix.map(i=>`<i style="background:${cur.pal[i].hex}" title="${cur.pal[i].name}"></i>`).join('')}</span>`;
+function renderNotes(){
+  const s=cur;
+  $('#notes').innerHTML=`
+  <div class="title"><h2>${s.name}</h2><div class="sci">${s.sci}</div>
+    <dl class="facts"><div><dt>분류 · 관찰 시기</dt><dd>${s.family} · ${s.when}</dd></div><div><dt>실제 크기</dt><dd>${s.size}</dd></div><div><dt>난이도</dt><dd>${s.level}</dd></div></dl></div>
+  <div class="block"><h3>관찰 포인트 <small>칠하기 전에 2분 동안 먼저 보기</small></h3>
+    <dl class="obs">${s.obs.map(o=>`<div><dt>${o[0]}</dt><dd>${o[1]}</dd></div>`).join('')}</dl></div>
+  <div class="block"><h3>색연필 칠하는 순서 <small>동그라미는 그 단계에 쓰는 색</small></h3>
+    <ol class="steps">${s.steps.map((st,i)=>`<li><span class="num">${i+1}</span><span><b>${st[0]}${dots(st[1])}</b>${st[2]}</span></li>`).join('')}</ol></div>
+  <div class="duo"><div class="note tip"><h4>표현 팁</h4><ul>${s.tip.map(t=>`<li>${t}</li>`).join('')}</ul></div>
+    <div class="note warn"><h4>자주 하는 실수</h4><ul>${s.miss.map(t=>`<li>${t}</li>`).join('')}</ul></div></div>
+  <div class="block"><h3>탐구 질문</h3><p class="ask">${s.ask}</p></div>
+  ${s.book==='animal'?'<p class="care">살아 있는 생물은 잠깐 관찰하고 원래 있던 곳에 놓아 주어요. 직접 보기 어려우면 표본이나 사진을 보고 그려요.</p>':''}
+  <details class="prompt"><summary>이 그림을 만든 GPT 프롬프트 (선생님용)</summary><div class="ptext" id="pt1">${esc(promptOf(s))}</div><button class="copy" data-copy="pt1" type="button">복사하기</button></details>`;
+}
+function promptOf(s){return `${s.prompt}. ${STYLE}.`}
+
+/* ---------- 기법 견본 ---------- */
+(function(){
+  const W=380,H=220;const mk=(fn)=>{const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');paper(x,W,H);fn(x);return c};
+  const items=[
+    ['필압 조절','힘을 빼면 연하게, 줄수록 진하게. 같은 색 하나로 밝음부터 어두움까지 만들어요.',x=>{strokes(x,14,30,352,160,{color:'#3B6FB6',n:2600,len:30,alpha:.3,seed:1,fade:t=>Math.pow(t,1.4)+.03});grain(x,14,30,352,160,1)}],
+    ['레이어링 (겹칠)','한 번에 진하게 말고 연하게 여러 번. 왼쪽부터 1겹, 2겹, 3겹이에요.',x=>{[1,2,3].forEach((k,i)=>{for(let j=0;j<k;j++)strokes(x,14+i*120,30,110,160,{color:'#D7322B',n:420,len:30,alpha:.22,seed:i*9+j,angle:-35+j*55})});grain(x,14,30,352,160,2)}],
+    ['혼색','두 색을 겹쳐 새 색을 만들어요. 노랑 위에 파랑을 얹으면 초록이 돼요.',x=>{strokes(x,14,30,230,160,{color:'#F2D43A',n:1500,len:32,alpha:.35,seed:3});strokes(x,136,30,230,160,{color:'#3B6FB6',n:1500,len:32,alpha:.3,seed:4,angle:40});grain(x,14,30,352,160,3)}],
+    ['버니싱','마지막에 흰색이나 연한 색으로 세게 문질러 종이 결을 메우면 매끈하고 반짝여요. 오른쪽이 버니싱한 부분이에요.',x=>{strokes(x,14,30,352,160,{color:'#C08A3E',n:2200,len:30,alpha:.3,seed:5});grain(x,14,30,352,160,5);x.fillStyle='rgba(192,138,62,.55)';x.fillRect(196,30,170,160);x.fillStyle='rgba(255,250,240,.18)';x.fillRect(196,30,170,160)}],
+    ['하이라이트 남기기','가장 밝은 곳은 칠하지 않고 종이 색을 남겨요. 잎맥처럼 가는 선은 칠하기 전에 볼펜으로 눌러 홈을 내요(인덴팅).',x=>{x.save();x.beginPath();x.arc(120,110,78,0,Math.PI*2);x.clip();strokes(x,42,32,156,156,{color:'#F07C1F',n:1500,len:24,alpha:.32,seed:6,angle:-20});x.fillStyle='#fff';x.beginPath();x.ellipse(98,84,16,11,-.5,0,Math.PI*2);x.fill();grain(x,42,32,156,156,6);x.restore();
+      strokes(x,230,30,136,160,{color:'#7A8A2E',n:900,len:26,alpha:.3,seed:7});x.strokeStyle='#fff';x.lineWidth=2.2;x.beginPath();x.moveTo(298,190);x.lineTo(298,40);for(let k=0;k<4;k++){x.moveTo(298,170-k*36);x.lineTo(240,140-k*36);x.moveTo(298,170-k*36);x.lineTo(356,140-k*36)}x.stroke()}]
+  ];
+  const box=$('#tech');items.forEach(([t,d,fn])=>{const f=document.createElement('figure');f.appendChild(mk(fn));f.insertAdjacentHTML('beforeend',`<figcaption><b>${t}</b>${d}</figcaption>`);box.appendChild(f)});
+})();
+
+/* ---------- 프롬프트 모음 ---------- */
+$('#plist').innerHTML=SPEC.map((s,i)=>`<div class="pitem"><header><h3>${s.name}</h3><span class="tagc">${s.book==='plant'?'식물':'동물'} · ${s.no}</span></header><p id="pp${i}">${esc(promptOf(s))}</p><div><button class="copy" data-copy="pp${i}" type="button">복사하기</button></div></div>`).join('');
+document.addEventListener('click',e=>{const b=e.target.closest('.copy');if(!b)return;const el=document.getElementById(b.dataset.copy);const t=el.textContent;
+  const ok=()=>{b.textContent='복사했어요';b.classList.add('ok');setTimeout(()=>{b.textContent='복사하기';b.classList.remove('ok')},1600)};
+  const fall=()=>{const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='선택됨 · Ctrl+C로 복사'};
+  try{navigator.clipboard.writeText(t).then(ok,fall)}catch(err){fall()}});
+
+/* ---------- 활동지 ---------- */
+function updateSheet(){
+  $('#wsTarget').textContent=$('#wsName').checked?cur.name:'';$('#wsDraw').classList.toggle('g',$('#wsGrid').checked);
+  const sw=$('#wsSw');sw.querySelectorAll('i').forEach(i=>i.remove());for(let i=0;i<8;i++){const el=document.createElement('i');sw.appendChild(el)}
+}
+$('#wsGrid').addEventListener('change',updateSheet);$('#wsName').addEventListener('change',updateSheet);
+
+/* ---------- 이미지 저장 (편집자만 올리기, 모두 보기) ---------- */
+let rmArmed=false;
+async function shrink(file){
+  try{const bm=await createImageBitmap(file);const s=Math.min(1,1600/Math.max(bm.width,bm.height));const c=document.createElement('canvas');c.width=Math.round(bm.width*s);c.height=Math.round(bm.height*s);
+    const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(bm,0,0,c.width,c.height);
+    return await new Promise(res=>c.toBlob(b=>res(b||file),'image/jpeg',.9))}catch(e){return file}
+}
+const msg=t=>{$('#upMsg').textContent=t};
+$('#upBtn').addEventListener('click',()=>$('#upFile').click());
+$('#upFile').addEventListener('change',async e=>{
+  const file=e.target.files[0];e.target.value='';if(!file||!assets||!db)return;const sp=cur;
+  $('#upBtn').disabled=true;msg(sp.name+' 그림을 올리는 중이에요…');
+  try{const blob=await shrink(file);const r=await assets.upload(blob);const old=imgs[sp.id];
+    await db.doc('images/'+sp.id).set({assetId:r.id,at:Date.now()});
+    if(old&&old.assetId&&old.assetId!==r.id)assets.delete(old.assetId).catch(()=>{});
+    msg(sp.name+' 그림을 넣었어요. 이 페이지를 여는 모든 사람에게 보여요.');
+  }catch(err){msg('그림을 올리지 못했어요 ('+(err&&err.code||'오류')+'). 파일이 20MB 이하의 그림 파일인지 확인하고 다시 시도해 주세요.')}
+  $('#upBtn').disabled=false;
+});
+$('#rmBtn').addEventListener('click',async()=>{
+  if(!rmArmed){rmArmed=true;$('#rmBtn').textContent='한 번 더 누르면 빠져요';return}
+  const sp=cur,old=imgs[sp.id];rmArmed=false;if(!old||!db)return;
+  try{await db.doc('images/'+sp.id).delete();if(assets)assets.delete(old.assetId).catch(()=>{});msg(sp.name+' 그림을 뺐어요.')}catch(err){msg('그림을 빼지 못했어요. 잠시 뒤 다시 시도해 주세요.')}
+});
+
+async function boot(){
+  if(!window.claude||!window.claude.use)return;
+  try{db=await window.claude.use('db')}catch(e){db=null}
+  if(db){
+    db.collection('images').onSnapshot(snap=>{
+      Object.keys(imgs).forEach(k=>delete imgs[k]);snap.docs.forEach(d=>{if(d.exists)imgs[d.id]=d.data()});
+      renderIndex();renderFrame();
+    },()=>{});
+  }
+  try{assets=await window.claude.use('assets')}catch(e){assets=null}
+  if(assets&&db)$('#edit').hidden=false;
+}
+
+function fromHash(){const id=location.hash.slice(1);
+  if(id==='animals'||id==='animal')return select(SPEC.find(s=>s.book==='animal').id,false);
+  select(SPEC.some(s=>s.id===id)?id:SPEC[0].id,false)}
+window.addEventListener('hashchange',fromHash);
+fromHash();boot();
+})();
+</script>
+
+</body>
+</html>
