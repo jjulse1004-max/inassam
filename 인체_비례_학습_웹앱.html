@@ -1,0 +1,700 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>인체 비례 놀이터</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap">
+<style>
+  /* Layout: navy header + floating tab bar (same family as 색 탐구 놀이터), figure card beside controls, stacking on phones */
+  :root{
+    --orange:#F26522; --orange-ink:#C24E14; --teal:#00A99D; --teal-ink:#007A71;
+    --navy:#1B2A4A; --ink:#20242E; --paper:#FBF9F5; --card:#FFFFFF;
+    --line:#E6E1D6; --muted:#6F6A5E; --band:#F3EEE3; --grid:#D6CEBD;
+    --body:#EBD9BC; --body-far:#D6BE98; --outline:#3A3328; --chip:#F2EFE6;
+    --ok:#1E8E4E; --warn:#C0392B;
+    --font:"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+    --orange:#FF7A3D; --orange-ink:#FF9563; --teal:#1CC3B5; --teal-ink:#3FD6C9;
+    --navy:#101B31; --ink:#ECE9E2; --paper:#13171E; --card:#1B212B;
+    --line:#2D3542; --muted:#A3ABB8; --band:#1E2530; --grid:#3A4556;
+    --body:#C2A57C; --body-far:#94795A; --outline:#0B0E13; --chip:#252D39;
+    --ok:#4CC47F; --warn:#FF7B6B; color-scheme:dark;
+  }}
+  :root[data-theme="dark"]{
+    --orange:#FF7A3D; --orange-ink:#FF9563; --teal:#1CC3B5; --teal-ink:#3FD6C9;
+    --navy:#101B31; --ink:#ECE9E2; --paper:#13171E; --card:#1B212B;
+    --line:#2D3542; --muted:#A3ABB8; --band:#1E2530; --grid:#3A4556;
+    --body:#C2A57C; --body-far:#94795A; --outline:#0B0E13; --chip:#252D39;
+    --ok:#4CC47F; --warn:#FF7B6B; color-scheme:dark;
+  }
+  *{box-sizing:border-box;}
+  body{background:var(--paper);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased;font-size:15px;line-height:1.6;}
+  .wrap{max-width:1000px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));}
+
+  header{background:var(--navy);color:#fff;margin-top:calc(-1 * env(safe-area-inset-top, 0px));padding-top:calc(env(safe-area-inset-top, 0px) + 32px);padding-bottom:84px;position:relative;overflow:hidden;}
+  header .wrap{display:flex;gap:24px;align-items:center;justify-content:space-between;}
+  .eyebrow{font-size:13px;letter-spacing:.14em;font-weight:700;color:#FF8A50;}
+  h1{margin:6px 0 6px;font-size:clamp(28px,4.6vw,44px);line-height:1.15;font-weight:800;text-wrap:balance;}
+  header p{max-width:540px;color:#C9CFDD;margin:0;}
+  #heroFig{width:112px;flex:none;}
+  @media (max-width:600px){#heroFig{display:none;}}
+
+  .tabbar{margin-top:-50px;position:relative;z-index:2;}
+  .tabs{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:7px;box-shadow:0 12px 30px -14px rgba(27,42,74,.35);overflow-x:auto;}
+  .tab{flex:1 1 0;min-width:104px;border:0;background:transparent;padding:11px 8px;border-radius:11px;font:inherit;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;}
+  .tab.active{background:var(--navy);color:#fff;}
+  :root:not([data-theme="light"]) .tab.active{box-shadow:inset 0 0 0 1px var(--grid);}
+  .tab:not(.active):hover{background:var(--chip);color:var(--ink);}
+  .tab:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--orange);outline-offset:2px;}
+
+  main{padding-block:26px 70px;}
+  section.panel{display:none;}
+  section.panel.active{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){section.panel.active{animation:none;}}
+
+  h2{font-size:22px;margin:0 0 4px;font-weight:800;text-wrap:balance;}
+  .lead{color:var(--muted);margin:0 0 18px;max-width:68ch;}
+  .grid2{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:18px;align-items:start;}
+  @media (max-width:760px){.grid2{grid-template-columns:minmax(0,1fr);}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;min-width:0;}
+  .figcard{padding:10px;}
+  .figcard svg{display:block;width:100%;height:auto;}
+  .stack{display:flex;flex-direction:column;gap:14px;}
+
+  .big{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+  .big b{font-size:44px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;color:var(--orange-ink);}
+  .big span{color:var(--muted);font-size:14px;}
+  input[type=range]{width:100%;accent-color:var(--orange);}
+  .label{font-size:12px;letter-spacing:.08em;font-weight:700;color:var(--muted);}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{border:1px solid var(--line);background:var(--chip);color:var(--ink);border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;}
+  .chip:hover{border-color:var(--orange);}
+  .chip.on{background:var(--navy);border-color:var(--navy);color:#fff;}
+  .note{background:var(--band);border-radius:12px;padding:12px 14px;font-size:14px;}
+  .note strong{color:var(--orange-ink);}
+  .toggles{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px;}
+  .toggles label{display:flex;gap:6px;align-items:center;cursor:pointer;}
+  .toggles input{accent-color:var(--teal);width:17px;height:17px;}
+
+  .compare{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-top:18px;}
+  @media (max-width:700px){.compare{grid-template-columns:repeat(3,minmax(0,1fr));}}
+  .cmp{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:6px 4px 8px;cursor:pointer;font:inherit;color:var(--ink);text-align:center;}
+  .cmp svg{width:100%;height:auto;display:block;}
+  .cmp b{display:block;font-size:13px;}
+  .cmp small{color:var(--muted);font-size:11.5px;}
+  .cmp.on{border-color:var(--orange);box-shadow:0 0 0 2px var(--orange) inset;}
+
+  .rules{display:flex;flex-direction:column;gap:6px;}
+  .rule{display:grid;grid-template-columns:28px minmax(0,1fr);gap:10px;text-align:left;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:10px 12px;font:inherit;color:var(--ink);cursor:pointer;}
+  .rule .n{width:28px;height:28px;border-radius:50%;background:var(--chip);display:grid;place-items:center;font-weight:800;font-size:13px;color:var(--muted);}
+  .rule b{display:block;font-size:14.5px;}
+  .rule span{display:none;font-size:13.5px;color:var(--muted);margin-top:3px;}
+  .rule.on{border-color:var(--orange);background:var(--band);}
+  .rule.on .n{background:var(--orange);color:#fff;}
+  .rule.on span{display:block;}
+
+  .btnrow{display:flex;flex-wrap:wrap;gap:6px;}
+  .btn{border:0;background:var(--navy);color:#fff;border-radius:10px;padding:9px 14px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;}
+  :root:not([data-theme="light"]) .btn{box-shadow:inset 0 0 0 1px var(--grid);}
+  .btn.ghost{background:var(--chip);color:var(--ink);box-shadow:none;}
+  .btn.orange{background:var(--orange);}
+  .status{font-size:14px;font-weight:700;padding:8px 12px;border-radius:10px;background:var(--band);}
+  .status.ok{color:var(--ok);} .status.warn{color:var(--warn);}
+  details{border:1px solid var(--line);border-radius:12px;padding:10px 12px;}
+  summary{cursor:pointer;font-weight:700;font-size:14px;}
+  .sliders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 14px;margin-top:10px;}
+  .sliders label{font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;}
+  #poser{touch-action:none;user-select:none;-webkit-user-select:none;}
+  .hnd{cursor:grab;}
+  .hnd:active{cursor:grabbing;}
+
+  .field{display:flex;flex-direction:column;gap:4px;}
+  .field input{font:inherit;font-size:18px;font-weight:700;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);width:100%;font-variant-numeric:tabular-nums;}
+  .fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  ol.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;}
+
+  .quiz .q{font-size:18px;font-weight:800;margin:6px 0 12px;text-wrap:balance;}
+  .opts{display:flex;flex-direction:column;gap:8px;}
+  .opt{text-align:left;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:12px 14px;font:inherit;cursor:pointer;}
+  .opt:hover:not([disabled]){border-color:var(--orange);}
+  .opt.right{border-color:var(--ok);background:color-mix(in srgb, var(--ok) 12%, var(--card));}
+  .opt.wrong{border-color:var(--warn);background:color-mix(in srgb, var(--warn) 12%, var(--card));}
+  .opt[disabled]{cursor:default;}
+  .progress{height:6px;background:var(--band);border-radius:6px;overflow:hidden;}
+  .progress i{display:block;height:100%;background:var(--orange);transition:width .3s;}
+  .explain{margin-top:12px;}
+  footer{color:var(--muted);font-size:13px;padding-block:0 40px;}
+
+  svg text{font-family:var(--font);}
+  .lbl{font-size:13px;font-weight:700;fill:var(--ink);paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round;}
+  .lbl.o{fill:var(--orange-ink);} .lbl.t{fill:var(--teal-ink);} .lbl.m{fill:var(--muted);font-weight:500;}
+</style>
+
+<header>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">미술 · 인체 표현</div>
+      <h1>인체 비례 놀이터</h1>
+      <p>머리 하나를 자로 삼아 몸을 재 봅니다. 나이에 따라 달라지는 등신, 몸 속에 숨은 비례의 규칙, 움직임을 만드는 동세까지 직접 움직이며 익혀 보세요.</p>
+    </div>
+    <svg id="heroFig" viewBox="-120 -12 240 548" aria-hidden="true"></svg>
+  </div>
+</header>
+
+<div class="wrap tabbar">
+  <nav class="tabs" role="tablist" aria-label="학습 단계">
+    <button class="tab active" role="tab" data-tab="p1">① 등신 탐구</button>
+    <button class="tab" role="tab" data-tab="p2">② 비례의 규칙</button>
+    <button class="tab" role="tab" data-tab="p3">③ 동세 마네킹</button>
+    <button class="tab" role="tab" data-tab="p4">④ 내 몸 재기</button>
+    <button class="tab" role="tab" data-tab="p5">⑤ 확인 퀴즈</button>
+  </nav>
+</div>
+
+<main class="wrap">
+  <!-- 1. 등신 -->
+  <section class="panel active" id="p1">
+    <h2>몇 등신일까요?</h2>
+    <p class="lead"><b>등신(等身)</b>은 키가 머리 길이(정수리~턱 끝)의 몇 배인지를 말해요. 키 160cm에 머리 길이가 20cm라면 160 ÷ 20 = 8, 곧 8등신입니다. 막대를 움직여 비례가 어떻게 바뀌는지 살펴보세요.</p>
+    <div class="grid2">
+      <div class="card figcard"><svg id="fig1" viewBox="-215 -20 470 560" role="img" aria-label="등신에 따라 바뀌는 인체 비례 그림"></svg></div>
+      <div class="stack">
+        <div class="card stack">
+          <div class="big"><b id="nVal">7.5등신</b><span id="nSub">머리 1개 = 키의 13%</span></div>
+          <input type="range" id="nRange" min="3" max="9" step="0.5" value="7.5" aria-label="등신 조절">
+          <div class="chips" id="presetChips"></div>
+          <div class="toggles">
+            <label><input type="checkbox" id="t1grid" checked> 머리 단위 눈금</label>
+            <label><input type="checkbox" id="t1lbl" checked> 몸의 기준점</label>
+            <label><input type="checkbox" id="t1half" checked> 키의 절반 선</label>
+          </div>
+        </div>
+        <div class="note" id="nText"></div>
+        <div class="note"><strong>관찰 포인트</strong> 청록색 <b>키의 절반 선</b>을 보세요. 아기는 배꼽 근처에, 어른은 사타구니에 있어요. 자라면서 머리보다 <b>다리가 훨씬 많이 자라기</b> 때문이에요.</div>
+      </div>
+    </div>
+    <h2 style="margin-top:26px;font-size:18px">같은 키, 다른 등신</h2>
+    <div class="compare" id="compare"></div>
+  </section>
+
+  <!-- 2. 규칙 -->
+  <section class="panel" id="p2">
+    <h2>몸 속에 숨은 비례의 규칙</h2>
+    <p class="lead">르네상스 화가 레오나르도 다빈치는 〈비트루비우스적 인간〉에서 몸의 각 부분이 서로 일정한 비율을 이룬다는 것을 그림으로 보여 주었어요. 성인 8등신 마네킹으로 규칙을 하나씩 확인해 보세요. (사람마다 조금씩 다르니 '대략'의 기준이에요.)</p>
+    <div class="grid2">
+      <div class="card figcard"><svg id="fig2" viewBox="0 -100 600 620" role="img" aria-label="비례 규칙을 표시한 마네킹"></svg></div>
+      <div class="rules" id="rules"></div>
+    </div>
+  </section>
+
+  <!-- 3. 동세 -->
+  <section class="panel" id="p3">
+    <h2>동세 마네킹</h2>
+    <p class="lead"><b>동세</b>는 몸의 움직임과 그 기세를 말해요. 동그란 조절점(팔꿈치·손·무릎·발·목·머리)을 끌어서 자세를 만들어 보세요. 뼈 길이는 그대로라서 어떤 자세에서도 비례가 유지돼요.</p>
+    <div class="grid2">
+      <div class="card figcard"><svg id="poser" viewBox="0 -100 600 620" role="img" aria-label="끌어서 자세를 바꾸는 마네킹"></svg></div>
+      <div class="stack">
+        <div class="card stack">
+          <div class="label">자세 불러오기</div>
+          <div class="chips" id="poseChips"></div>
+          <div class="btnrow">
+            <button class="btn ghost" id="flipBtn">좌우 반전</button>
+            <button class="btn ghost" id="randBtn">무작위 자세</button>
+          </div>
+          <div class="toggles">
+            <label><input type="checkbox" id="t3loa" checked> 동세선</label>
+            <label><input type="checkbox" id="t3bal" checked> 중심선(균형)</label>
+            <label><input type="checkbox" id="t3grid"> 머리 단위 눈금</label>
+            <label><input type="checkbox" id="t3hnd" checked> 조절점</label>
+          </div>
+          <div class="status" id="balStatus" aria-live="polite"></div>
+        </div>
+        <div class="note"><strong>동세선</strong>(주황)은 머리에서 몸통을 지나 체중을 받치는 발까지 이어지는 하나의 흐름이에요. 크로키를 할 때 이 선을 먼저 그으면 자세가 살아나요.<br><strong>중심선</strong>(청록 점선)은 목 아래 오목한 곳에서 수직으로 내린 선이에요. 이 선이 발 위에 떨어져야 서 있는 자세가 안정돼 보여요.</div>
+        <details>
+          <summary>관절 각도 직접 조절하기</summary>
+          <div class="sliders" id="sliders"></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. 내 몸 -->
+  <section class="panel" id="p4">
+    <h2>나는 몇 등신일까?</h2>
+    <p class="lead">짝과 함께 키와 머리 길이를 재서 넣어 보세요. 아래 숫자는 예시 값이에요.</p>
+    <div class="grid2">
+      <div class="card figcard"><svg id="fig4" viewBox="-215 -20 470 560" role="img" aria-label="입력한 값으로 그린 나의 비례"></svg></div>
+      <div class="stack">
+        <div class="card stack">
+          <div class="fields">
+            <label class="field"><span class="label">키 (cm)</span><input type="number" id="myH" value="160" min="50" max="220" inputmode="decimal"></label>
+            <label class="field"><span class="label">머리 길이 (cm)</span><input type="number" id="myHead" value="22" min="10" max="40" step="0.5" inputmode="decimal"></label>
+          </div>
+          <div class="big"><b id="myN">7.3등신</b><span id="myCmp"></span></div>
+        </div>
+        <div class="card stack">
+          <div class="label">머리 길이 재는 법</div>
+          <ol class="steps">
+            <li>벽에 등을 대고 바르게 서요.</li>
+            <li>짝이 책 한 권을 정수리에, 다른 한 권을 턱 끝 아래에 수평으로 대요.</li>
+            <li>두 책 사이의 거리를 자로 재면 머리 길이예요.</li>
+          </ol>
+        </div>
+        <div class="card stack">
+          <div class="label">연필로 비례 재기 (관찰 그림에서)</div>
+          <ol class="steps">
+            <li>팔을 쭉 펴고 한쪽 눈을 감아요. 팔을 굽히면 길이가 달라지니 끝까지 펴요.</li>
+            <li>연필 끝을 모델의 정수리에, 엄지손톱을 턱 끝에 맞춰 머리 길이를 잡아요.</li>
+            <li>그 길이를 아래로 한 칸씩 옮기며 발끝까지 몇 번 들어가는지 세어요.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. 퀴즈 -->
+  <section class="panel" id="p5">
+    <h2>확인 퀴즈</h2>
+    <p class="lead">배운 내용을 8문제로 정리해 봐요.</p>
+    <div class="card quiz" id="quiz" style="max-width:680px"></div>
+  </section>
+</main>
+
+<footer class="wrap">선생님 활용 팁: ①→③ 순서로 TV 화면에 띄워 설명한 뒤, ③의 자세를 보고 30초 크로키를 하고, ④는 짝 활동으로 진행하면 좋아요.</footer>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const R=d=>d*Math.PI/180, D=r=>r*180/Math.PI;
+const rot=([x,y],t)=>{const c=Math.cos(R(t)),s=Math.sin(R(t));return [x*c+y*s,-x*s+y*c];};
+const add=(a,b)=>[a[0]+b[0],a[1]+b[1]];
+const tf=(fr,p)=>add(fr.o,rot(p,fr.a));
+const norm=a=>{a=((a+180)%360+360)%360-180;return a;};
+const f1=n=>Math.round(n*10)/10;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- union-outline renderer (px coords) ---------- */
+function renderParts(parts,ow,fill){
+  let o='',f='';
+  for(const p of parts){
+    if(p.t==='c'){
+      const L=`x1="${p.a[0]}" y1="${p.a[1]}" x2="${p.b[0]}" y2="${p.b[1]}" stroke-linecap="round"`;
+      o+=`<line ${L} stroke="var(--outline)" stroke-width="${p.w+ow*2}"/>`;
+      f+=`<line ${L} stroke="${fill}" stroke-width="${p.w}"/>`;
+    }else if(p.t==='e'){
+      const E=`cx="${p.c[0]}" cy="${p.c[1]}" rx="${p.rx}" ry="${p.ry}" transform="rotate(${p.r||0} ${p.c[0]} ${p.c[1]})"`;
+      o+=`<ellipse ${E} fill="var(--outline)" stroke="var(--outline)" stroke-width="${ow*2}"/>`;
+      f+=`<ellipse ${E} fill="${fill}"/>`;
+    }else if(p.t==='p'){
+      o+=`<path d="${p.d}" fill="var(--outline)" stroke="var(--outline)" stroke-width="${ow*2}" stroke-linejoin="round"/>`;
+      f+=`<path d="${p.d}" fill="${fill}"/>`;
+    }
+  }
+  return `<g>${o}${f}</g>`;
+}
+function pathD(cmds,map){
+  return cmds.map(c=>{const k=c[0];const r=[];for(let i=1;i<c.length;i+=2){const p=map([c[i],c[i+1]]);r.push(p[0].toFixed(1)+' '+p[1].toFixed(1));}return k+r.join(' ');}).join('');
+}
+
+/* ---------- 1. standing figure by head count ---------- */
+const PRESETS=[
+  {n:3,name:'SD 캐릭터',sub:'귀여운 과장'},
+  {n:4,name:'아기',sub:'1~2세'},
+  {n:5.5,name:'어린이',sub:'6~7세'},
+  {n:7,name:'중학생',sub:'13~15세'},
+  {n:7.5,name:'성인',sub:'실제 평균'},
+  {n:9,name:'패션 일러스트',sub:'이상화된 과장'}
+];
+function lerpTable(pts,x){
+  if(x<=pts[0][0])return pts[0][1];
+  for(let i=1;i<pts.length;i++){if(x<=pts[i][0]){const [x0,y0]=pts[i-1],[x1,y1]=pts[i];return y0+(y1-y0)*(x-x0)/(x1-x0);}}
+  return pts[pts.length-1][1];
+}
+function geom(N,FH){
+  const h=FH/N, k=(N-3)/6;
+  const g={N,h,FH};
+  g.chin=h;
+  g.shY=h+h*(0.1+0.035*(N-3));
+  g.crotch=FH*lerpTable([[3,0.64],[4,0.6],[5.5,0.55],[7,0.51],[7.5,0.5],[9,0.455]],N);
+  g.nipple=g.shY+(g.crotch-g.shY)*0.27;
+  g.navel=g.shY+(g.crotch-g.shY)*0.63;
+  g.hipY=g.crotch-0.16*h;
+  g.knee=g.crotch+(FH-g.crotch)*0.5;
+  g.ankle=FH-FH*0.035;
+  g.sh=FH*(0.135-0.025*k);
+  g.headW=h*(0.88-0.14*k);
+  g.waist=FH*(0.085-0.016*k);
+  g.hip=FH*(0.06-0.01*k);
+  g.tk=FH*(0.062-0.016*k);
+  g.wristY=g.shY+(g.crotch-g.shY)*(0.86+0.12*k);
+  g.elbowY=g.shY+(g.wristY-g.shY)*0.5;
+  g.hand=h*(0.55+0.2*k);
+  return g;
+}
+function drawStanding(N,opt){
+  opt=Object.assign({FH:520,grid:true,labels:true,half:true,numbers:true,ow:2},opt||{});
+  const g=geom(N,opt.FH), {h,FH,tk}=g;
+  let s='';
+  if(opt.grid){
+    const bands=Math.ceil(N-1e-6), gw=opt.labels?190:100;
+    for(let i=0;i<bands;i++){
+      const y0=i*h,y1=Math.min((i+1)*h,FH);
+      if(i%2===0)s+=`<rect x="${-gw}" y="${y0}" width="${gw*2}" height="${y1-y0}" fill="var(--band)"/>`;
+      s+=`<line x1="${-gw}" x2="${gw}" y1="${y0}" y2="${y0}" stroke="var(--grid)" stroke-width="1"/>`;
+      if(opt.numbers){const full=(y1-y0)>h*0.99;s+=`<text x="${-gw+8}" y="${(y0+y1)/2+5}" class="lbl m" style="font-size:${opt.labels?14:22}px;font-weight:700">${full?i+1:'½'}</text>`;}
+    }
+  }
+  s+=`<line x1="-200" x2="200" y1="${FH}" y2="${FH}" stroke="var(--outline)" stroke-width="2"/>`;
+  // parts
+  const ex=Math.max(g.waist+tk*0.7,g.sh-tk*0.2), wx=g.hip+tk*1.35;
+  const parts=[];
+  for(const sx of [-1,1]){
+    parts.push({t:'c',a:[sx*g.hip,g.hipY],b:[sx*g.hip*0.92,g.knee],w:tk*1.32});
+    parts.push({t:'c',a:[sx*g.hip*0.92,g.knee],b:[sx*g.hip*0.82,g.ankle],w:tk*0.98});
+    parts.push({t:'e',c:[sx*(g.hip*0.82+tk*0.2),FH-tk*0.36],rx:tk*0.85,ry:tk*0.38});
+    parts.push({t:'c',a:[sx*(g.sh-tk*0.45),g.shY+tk*0.45],b:[sx*ex,g.elbowY],w:tk*0.95});
+    parts.push({t:'c',a:[sx*ex,g.elbowY],b:[sx*wx,g.wristY],w:tk*0.78});
+    parts.push({t:'e',c:[sx*(wx+tk*0.05),g.wristY+g.hand/2],rx:tk*0.42,ry:g.hand/2});
+  }
+  const mid=(g.shY+g.navel)/2, hw=g.hip+tk*0.68;
+  const tor=[['M',-g.sh,g.shY+tk*0.5],['Q',-g.sh,g.shY,-g.sh+tk*0.5,g.shY],['L',g.sh-tk*0.5,g.shY],['Q',g.sh,g.shY,g.sh,g.shY+tk*0.5],
+    ['Q',g.waist*1.12,mid,g.waist,g.navel],['Q',hw*1.02,(g.navel+g.hipY)/2,hw,g.hipY],['Q',hw*0.7,g.crotch,0,g.crotch],
+    ['Q',-hw*0.7,g.crotch,-hw,g.hipY],['Q',-hw*1.02,(g.navel+g.hipY)/2,-g.waist,g.navel],['Q',-g.waist*1.12,mid,-g.sh,g.shY+tk*0.5],['Z']];
+  parts.push({t:'p',d:pathD(tor,p=>p)});
+  parts.push({t:'c',a:[0,g.chin-h*0.1],b:[0,g.shY+2],w:g.headW*0.42});
+  parts.push({t:'e',c:[0,h/2],rx:g.headW/2,ry:h/2});
+  s+=renderParts(parts,opt.ow,'var(--body)');
+  // eye line
+  s+=`<line x1="${-g.headW*0.32}" x2="${g.headW*0.32}" y1="${h/2}" y2="${h/2}" stroke="var(--outline)" stroke-width="1.2" stroke-dasharray="3 3" opacity=".55"/>`;
+  if(opt.half){
+    s+=`<line x1="-200" x2="200" y1="${FH/2}" y2="${FH/2}" stroke="var(--teal)" stroke-width="2.5" stroke-dasharray="8 5"/>`;
+    if(opt.labels)s+=`<text x="-196" y="${FH/2-7}" class="lbl t">키의 ½</text>`;
+  }
+  if(opt.labels){
+    const L=[[0,'정수리'],[g.chin,'턱'],[g.nipple,'가슴'],[g.navel,'배꼽'],[g.crotch,'사타구니'],[g.knee,'무릎'],[FH,'발바닥']];
+    let last=-99; const lx=150;
+    for(const [y,t] of L){
+      const ty=Math.max(y,last+17); last=ty;
+      s+=`<line x1="${g.sh*0.2}" x2="${lx-6}" y1="${y}" y2="${y}" stroke="var(--orange)" stroke-width="1" stroke-dasharray="2 3" opacity=".8"/>`;
+      s+=`<circle cx="${lx-6}" cy="${y}" r="2.5" fill="var(--orange)"/>`;
+      s+=`<text x="${lx}" y="${ty+4.5}" class="lbl o">${t}</text>`;
+    }
+  }
+  return s;
+}
+
+/* ---------- tab 1 ---------- */
+const nRange=$('#nRange');
+const chips=$('#presetChips'), cmp=$('#compare');
+PRESETS.forEach(p=>{
+  const b=document.createElement('button');b.className='chip';b.textContent=`${p.name} ${p.n}`;b.dataset.n=p.n;chips.appendChild(b);
+  const c=document.createElement('button');c.className='cmp';c.dataset.n=p.n;
+  c.innerHTML=`<svg viewBox="-110 -10 220 540" aria-hidden="true">${drawStanding(p.n,{labels:false,half:true,numbers:true,ow:3})}</svg><b>${p.n}등신</b><small>${p.name} · ${p.sub}</small>`;
+  cmp.appendChild(c);
+});
+function nText(N){
+  if(N<=3.5)return '<strong>SD(슈퍼 디포르메) 캐릭터</strong> 머리를 아주 크게, 몸을 작게 그리면 귀엽고 아기 같은 느낌이 나요. 실제 사람의 비례가 아니라 일부러 과장한 표현이에요.';
+  if(N<=4.5)return '<strong>1~2세 아기</strong> 머리가 키의 약 ¼이나 돼요. 키의 절반이 배꼽 근처에 있고, 팔다리가 짧고 통통해요.';
+  if(N<=6)return '<strong>초등 저학년 어린이</strong> 다리가 길어지면서 키의 절반이 배꼽과 사타구니 사이로 내려와요.';
+  if(N<=7.25)return '<strong>중학생 무렵</strong> 어른 비례에 가까워져요. 키의 절반이 거의 사타구니에 와요. 여러분의 몸이 바로 이 단계예요.';
+  if(N<=8.25)return '<strong>성인</strong> 실제 성인은 대개 7~7.5등신이에요. 미술 교재에서는 나누기 쉬운 8등신을 기준 그림으로 자주 써요. 키의 절반은 사타구니예요.';
+  return '<strong>패션 일러스트 · 영웅 캐릭터</strong> 실제보다 다리를 길게 늘여 늘씬하고 당당해 보이게 과장한 비례예요. 머리는 그대로 두고 다리만 길어진 것에 주목하세요.';
+}
+function setN(N){
+  nRange.value=N;
+  $('#nVal').textContent=`${N}등신`;
+  $('#nSub').textContent=`머리 1개 = 키의 ${Math.round(100/N)}%`;
+  $('#fig1').innerHTML=drawStanding(N,{grid:$('#t1grid').checked,labels:$('#t1lbl').checked,half:$('#t1half').checked});
+  $('#nText').innerHTML=nText(N);
+  document.querySelectorAll('#presetChips .chip,#compare .cmp').forEach(el=>el.classList.toggle('on',+el.dataset.n===N));
+}
+nRange.addEventListener('input',()=>setN(+nRange.value));
+['#t1grid','#t1lbl','#t1half'].forEach(id=>$(id).addEventListener('change',()=>setN(+nRange.value)));
+chips.addEventListener('click',e=>{const b=e.target.closest('[data-n]');if(b)setN(+b.dataset.n);});
+cmp.addEventListener('click',e=>{const b=e.target.closest('[data-n]');if(b){setN(+b.dataset.n);$('#fig1').scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'});}});
+setN(7.5);
+$('#heroFig').innerHTML=drawStanding(8,{labels:false,half:false,numbers:true,ow:3,grid:true}).replace(/var\(--band\)/g,'rgba(255,255,255,.07)').replace(/var\(--grid\)/g,'rgba(255,255,255,.25)').replace(/class="lbl m"/g,'fill="#FF8A50"').replace(/var\(--outline\)/g,'#0E1626').replace(/var\(--body\)/g,'#EBD9BC');
+
+/* ---------- mannequin (head units, 8 heads tall) ---------- */
+const SK={hip:[0.42,0.15],waist:[0,-0.75],neck:[0,-1.45],sh:[0.7,-1.4],chin:[0,-0.4],head:[0,-0.9],ua:1.35,fa:1.2,hand:0.75,th:2.2,sn:1.78};
+const KEYS=['a0','a1','a2','A1','A2','B1','B2','LA1','LA2','LB1','LB2','lift'];
+const KEYNAMES={a0:'골반·몸 기울기',a1:'허리(상체)',a2:'목·머리',A1:'뒤팔 어깨',A2:'뒤팔 팔꿈치',B1:'앞팔 어깨',B2:'앞팔 팔꿈치',LA1:'뒷다리 엉덩이',LA2:'뒷다리 무릎',LB1:'앞다리 엉덩이',LB2:'앞다리 무릎'};
+const P=(o)=>Object.assign({a0:0,a1:0,a2:0,A1:-7,A2:3,B1:7,B2:-3,LA1:-3,LA2:0,LB1:3,LB2:0,lift:0,facing:1,stool:false},o);
+const POSES={
+  stand:{name:'차렷',p:P({})},
+  walk:{name:'걷기',p:P({a1:-5,a2:3,A1:28,A2:22,B1:-26,B2:12,LA1:-20,LA2:-22,LB1:22,LB2:-6})},
+  run:{name:'달리기',p:P({a0:-12,a1:-6,a2:8,A1:60,A2:88,B1:-50,B2:85,LA1:-38,LA2:-100,LB1:58,LB2:-45})},
+  jump:{name:'점프',p:P({a1:6,a2:-8,A1:-150,A2:-8,B1:150,B2:8,LA1:-12,LA2:-70,LB1:35,LB2:-85,lift:0.5})},
+  sit:{name:'앉기',p:P({a1:-6,A1:25,A2:45,B1:18,B2:55,LA1:84,LA2:-86,LB1:88,LB2:-88,stool:true})},
+  throw:{name:'공 던지기',p:P({a0:-6,a1:16,a2:-6,A1:70,A2:25,B1:-125,B2:-65,LA1:-26,LA2:-8,LB1:30,LB2:-4})},
+  kick:{name:'공 차기',p:P({a0:-4,a1:10,a2:6,A1:55,A2:30,B1:-60,B2:20,LA1:-6,LA2:-4,LB1:70,LB2:-20})},
+  tpose:{name:'팔 벌리기',p:P({A1:-90,A2:0,B1:90,B2:0,LA1:-3,LB1:3})}
+};
+
+class Mannequin{
+  constructor(svg,opt){this.svg=svg;this.o=Object.assign({u:56,cx:300,oy:24,handles:false,grid:false,loa:false,bal:false,overlay:null,onChange:null},opt);this.pose=P({});this.drag=null;this.dyLock=null;if(this.o.handles)this.bindDrag();}
+  fk(p){
+    const root=[0,3.6], pel={o:root,a:p.a0}, waist=tf(pel,SK.waist), chest={o:waist,a:p.a0+p.a1};
+    const neck=tf(chest,SK.neck), headF={o:neck,a:chest.a+p.a2};
+    const J={root,waist,neck,pel,chest,headF,head:tf(headF,SK.head),chin:tf(headF,SK.chin),crotch:tf(pel,[0,0.42])};
+    for(const side of ['A','B']){
+      const sx=side==='A'?-1:1;
+      const sh=tf(chest,[sx*SK.sh[0],SK.sh[1]]), ua=chest.a+p[side+'1'], el=add(sh,rot([0,SK.ua],ua));
+      const fa=ua+p[side+'2'], wr=add(el,rot([0,SK.fa],fa)), hd=add(wr,rot([0,SK.hand],fa));
+      const hip=tf(pel,[sx*SK.hip[0],SK.hip[1]]), tha=p.a0+p['L'+side+'1'], kn=add(hip,rot([0,SK.th],tha));
+      const sna=tha+p['L'+side+'2'], an=add(kn,rot([0,SK.sn],sna)), ft=add(an,rot([p.facing*0.26,0.17],sna));
+      J[side]={sh,el,wr,hd,hip,kn,an,ft,ua,fa,tha,sna};
+    }
+    const maxY=Math.max(J.A.ft[1]+0.14,J.B.ft[1]+0.14,J.A.hd[1],J.B.hd[1],J.A.kn[1]+0.27,J.B.kn[1]+0.27,J.head[1]+0.5);
+    J.dy=8-p.lift-maxY;
+    return J;
+  }
+  px(p,dy){const u=this.o.u;return [+(this.o.cx+p[0]*u).toFixed(1),+(this.o.oy+(p[1]+dy)*u).toFixed(1)];}
+  render(){
+    const p=this.pose, J=this.fk(p); const u=this.o.u;
+    const dy=this.dyLock!==null?this.dyLock:J.dy; this.J=J; this.dy=dy;
+    const X=q=>this.px(q,dy);
+    let s='';
+    if(this.o.grid){
+      for(let i=0;i<8;i++){const y0=this.o.oy+i*u;
+        if(i%2===0)s+=`<rect x="20" y="${y0}" width="560" height="${u}" fill="var(--band)"/>`;
+        s+=`<line x1="20" x2="580" y1="${y0}" y2="${y0}" stroke="var(--grid)"/><text x="28" y="${y0+u/2+5}" class="lbl m" style="font-weight:700">${i+1}</text>`;}
+    }
+    s+=`<line x1="10" x2="590" y1="${this.o.oy+8*u}" y2="${this.o.oy+8*u}" stroke="var(--outline)" stroke-width="2"/>`;
+    if(p.stool){const r=X(J.root);s+=`<rect x="${r[0]-0.75*u}" y="${r[1]+0.42*u}" width="${1.5*u}" height="${this.o.oy+8*u-r[1]-0.42*u}" rx="6" fill="var(--chip)" stroke="var(--grid)" stroke-width="2"/>`;}
+    const limb=(side,fill)=>{
+      const L=J[side], parts=[];
+      parts.push({t:'c',a:X(L.hip),b:X(L.kn),w:0.55*u},{t:'c',a:X(L.kn),b:X(L.an),w:0.4*u});
+      parts.push({t:'e',c:X(L.ft),rx:0.48*u,ry:0.15*u,r:-L.sna});
+      parts.push({t:'c',a:X(L.sh),b:X(L.el),w:0.36*u},{t:'c',a:X(L.el),b:X(L.wr),w:0.3*u});
+      parts.push({t:'e',c:X(add(L.wr,rot([0,0.36],L.fa))),rx:0.15*u,ry:0.37*u,r:-L.fa});
+      let g=renderParts(parts,2,fill);
+      for(const q of [L.sh,L.el,L.kn,L.hip])g+=`<circle cx="${X(q)[0]}" cy="${X(q)[1]}" r="${0.1*u}" fill="none" stroke="var(--outline)" stroke-opacity=".28" stroke-width="1.5"/>`;
+      return g;
+    };
+    const far='A', near='B';
+    const legFirst=(side,fill)=>limb(side,fill);
+    s+=legFirst(far,'var(--body-far)');
+    // body
+    const chest=[['M',-0.62,-1.6],['L',0.62,-1.6],['Q',0.9,-1.57,0.86,-1.25],['Q',0.76,-0.5,0.5,0.05],['L',-0.5,0.05],['Q',-0.76,-0.5,-0.86,-1.25],['Q',-0.9,-1.57,-0.62,-1.6],['Z']];
+    const pelvis=[['M',-0.5,-0.88],['L',0.5,-0.88],['Q',0.72,-0.2,0.68,0.15],['Q',0.5,0.48,0,0.48],['Q',-0.5,0.48,-0.68,0.15],['Q',-0.72,-0.2,-0.5,-0.88],['Z']];
+    const bparts=[
+      {t:'p',d:pathD(pelvis,q=>X(tf(J.pel,q)))},
+      {t:'p',d:pathD(chest,q=>X(tf(J.chest,q)))},
+      {t:'c',a:X(J.neck),b:X(J.chin),w:0.3*u},
+      {t:'e',c:X(J.head),rx:0.37*u,ry:0.5*u,r:-J.headF.a}
+    ];
+    s+=renderParts(bparts,2,'var(--body)');
+    const w=X(J.waist);s+=`<circle cx="${w[0]}" cy="${w[1]}" r="${0.12*u}" fill="none" stroke="var(--outline)" stroke-opacity=".28" stroke-width="1.5"/>`;
+    const eye=X(tf(J.headF,[p.facing*0.2,-0.95]));s+=`<circle cx="${eye[0]}" cy="${eye[1]}" r="3.2" fill="var(--outline)" opacity=".7"/>`;
+    s+=legFirst(near,'var(--body)');
+    // line of action
+    if(this.o.loa){
+      const sup=(p.stool)?null:(J.A.an[1]>J.B.an[1]+0.05?J.A.an:(J.B.an[1]>J.A.an[1]+0.05?J.B.an:[(J.A.an[0]+J.B.an[0])/2,J.A.an[1]]));
+      const pts=[J.head,J.neck,J.waist,J.root].concat(sup?[sup]:[]).map(X);
+      s+=`<path d="${catmull(pts)}" fill="none" stroke="var(--orange)" stroke-width="7" stroke-linecap="round" opacity=".75"/>`;
+    }
+    if(this.o.bal){
+      const n=X(J.neck), fy=this.o.oy+8*u;
+      s+=`<line x1="${n[0]}" x2="${n[0]}" y1="${n[1]}" y2="${fy}" stroke="var(--teal)" stroke-width="2.5" stroke-dasharray="7 5"/><circle cx="${n[0]}" cy="${n[1]}" r="5" fill="var(--teal)"/>`;
+      this.balance=this.judge(J,dy);
+      if(this.balance.range){const [a,b]=this.balance.range.map(x=>this.o.cx+x*u);s+=`<rect x="${a}" y="${fy-3}" width="${b-a}" height="6" rx="3" fill="var(--teal)" opacity=".35"/>`;}
+    }
+    if(this.o.overlay)s+=this.o.overlay(J,X,this);
+    if(this.o.handles&&this.showHandles!==false){
+      for(const h of this.handleDefs(J)){const c=X(h.pos);s+=`<g class="hnd" data-h="${h.id}"><circle cx="${c[0]}" cy="${c[1]}" r="17" fill="transparent"/><circle cx="${c[0]}" cy="${c[1]}" r="8" fill="var(--card)" stroke="var(--orange)" stroke-width="3"/></g>`;}
+    }
+    this.svg.innerHTML=s;
+    if(this.o.onChange)this.o.onChange(this);
+  }
+  judge(J,dy){
+    const p=this.pose;
+    if(p.stool)return {cls:'ok',text:'의자가 몸무게를 받치고 있어서 안정적이에요.'};
+    const ground=['A','B'].filter(s=>J[s].ft[1]+0.14+dy>7.85);
+    if(!ground.length)return {cls:'',text:'공중에 떠 있는 순간이에요. 착지하는 발 쪽으로 중심이 옮겨 가요.'};
+    const xs=[];ground.forEach(s=>{xs.push(J[s].ft[0]-0.48,J[s].ft[0]+0.48);});
+    const lo=Math.min(...xs), hi=Math.max(...xs), x=J.neck[0];
+    if(x>=lo&&x<=hi)return {cls:'ok',text:'중심선이 발 위에 떨어져요. 균형이 안정적이에요.',range:[lo,hi]};
+    return {cls:'warn',text:'중심선이 발 밖으로 벗어났어요. 움직이는 중이 아니라면 넘어질 것 같은 자세예요.',range:[lo,hi]};
+  }
+  handleDefs(J){
+    const p=this.pose, H=[];
+    for(const s of ['A','B']){const L=J[s];
+      H.push({id:s+'1',key:s+'1',pos:L.el,origin:L.sh,parent:J.chest.a});
+      H.push({id:s+'2',key:s+'2',pos:L.hd,origin:L.el,parent:L.ua});
+      H.push({id:'L'+s+'1',key:'L'+s+'1',pos:L.kn,origin:L.hip,parent:p.a0});
+      H.push({id:'L'+s+'2',key:'L'+s+'2',pos:L.an,origin:L.kn,parent:L.tha});
+    }
+    H.push({id:'a1',key:'a1',pos:J.neck,origin:J.waist,parent:p.a0,up:true});
+    H.push({id:'a2',key:'a2',pos:J.head,origin:J.neck,parent:J.chest.a,up:true});
+    return H;
+  }
+  bindDrag(){
+    const svg=this.svg;
+    const pt=e=>{const q=svg.createSVGPoint();q.x=e.clientX;q.y=e.clientY;const r=q.matrixTransform(svg.getScreenCTM().inverse());return [(r.x-this.o.cx)/this.o.u,(r.y-this.o.oy)/this.o.u-this.dy];};
+    svg.addEventListener('pointerdown',e=>{const h=e.target.closest('[data-h]');if(!h)return;this.drag=h.dataset.h;this.dyLock=this.dy;try{svg.setPointerCapture(e.pointerId);}catch(_){}e.preventDefault();});
+    svg.addEventListener('pointermove',e=>{
+      if(!this.drag)return;
+      const q=pt(e), d=this.handleDefs(this.J).find(h=>h.id===this.drag); if(!d)return;
+      let th=D(Math.atan2(q[0]-d.origin[0],q[1]-d.origin[1])); if(d.up)th-=180;
+      this.pose[d.key]=Math.round(norm(th-d.parent)); this.render();
+    });
+    const end=()=>{if(!this.drag)return;this.drag=null;const from=this.dy;this.dyLock=null;const J=this.fk(this.pose);this.settle(from,J.dy);};
+    svg.addEventListener('pointerup',end);svg.addEventListener('pointercancel',end);
+  }
+  settle(from,to){
+    if(reduce||Math.abs(from-to)<0.01){this.render();return;}
+    const t0=performance.now();
+    const step=t=>{const k=Math.min(1,(t-t0)/250);this.dyLock=from+(to-from)*k*(2-k);this.render();if(k<1)requestAnimationFrame(step);else{this.dyLock=null;this.render();}};
+    requestAnimationFrame(step);
+  }
+  animateTo(target,ms=480){
+    const from=Object.assign({},this.pose);
+    this.pose.stool=target.stool;this.pose.facing=target.facing;
+    if(reduce){Object.assign(this.pose,target);this.render();return;}
+    const t0=performance.now(), fromDy=this.dy, toDy=this.fk(target).dy;
+    const step=t=>{
+      let k=Math.min(1,(t-t0)/ms);k=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+      for(const key of KEYS){const a=from[key],b=target[key];this.pose[key]=key==='lift'?a+(b-a)*k:a+norm(b-a)*k;}
+      this.dyLock=fromDy+(toDy-fromDy)*k;this.render();
+      if(k<1)requestAnimationFrame(step);else{this.dyLock=null;Object.assign(this.pose,target);this.render();}
+    };
+    requestAnimationFrame(step);
+  }
+}
+function catmull(pts){
+  if(pts.length<2)return '';
+  let d=`M${pts[0][0]} ${pts[0][1]}`;
+  for(let i=0;i<pts.length-1;i++){
+    const p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||p2;
+    const c1=[p1[0]+(p2[0]-p0[0])/6,p1[1]+(p2[1]-p0[1])/6],c2=[p2[0]-(p3[0]-p1[0])/6,p2[1]-(p3[1]-p1[1])/6];
+    d+=`C${c1[0].toFixed(1)} ${c1[1].toFixed(1)} ${c2[0].toFixed(1)} ${c2[1].toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+  }
+  return d;
+}
+
+/* ---------- tab 2: rules ---------- */
+const u=56, OY=24, CX=300, yH=v=>OY+v*u;
+const hl=(y,c,x1=40,x2=560)=>`<line x1="${x1}" x2="${x2}" y1="${y}" y2="${y}" stroke="var(--${c})" stroke-width="2.5" stroke-dasharray="8 5"/>`;
+const txt=(x,y,t,c='o',a='start')=>`<text x="${x}" y="${y}" class="lbl ${c}" text-anchor="${a}">${t}</text>`;
+const dot=(p,c='orange',r=6)=>`<circle cx="${p[0]}" cy="${p[1]}" r="${r}" fill="var(--${c})" stroke="var(--card)" stroke-width="2"/>`;
+function brV(x,y1,y2,label,c='orange',side=1){
+  const t=8*side;
+  return `<path d="M${x+t} ${y1}H${x}V${y2}H${x+t}" fill="none" stroke="var(--${c})" stroke-width="2.5"/>`+txt(x-6*side,(y1+y2)/2+5,label,c==='orange'?'o':'t',side>0?'end':'start');
+}
+function brH(y,x1,x2,label,c='orange'){
+  return `<path d="M${x1} ${y+8}V${y}H${x2}V${y+8}" fill="none" stroke="var(--${c})" stroke-width="2.5"/>`+txt((x1+x2)/2,y-8,label,c==='orange'?'o':'t','middle');
+}
+const RULES=[
+  {t:'키의 절반 = 사타구니',d:'성인은 정수리에서 사타구니까지와 사타구니에서 발바닥까지가 거의 같아요. 머리 4개 + 머리 4개.',pose:'stand',
+    draw:(J,X)=>{const c=X(J.crotch);return hl(yH(4),'teal')+brV(150,yH(0),yH(4),'머리 4개','orange',1)+brV(150,yH(4),yH(8),'머리 4개','orange',1)+dot(c)+txt(470,yH(4)-8,'키의 ½','t');}},
+  {t:'팔을 벌린 길이 = 키',d:'두 팔을 양옆으로 쭉 벌린 길이(손끝~손끝)는 키와 거의 같아요. 그래서 몸이 정사각형 안에 꼭 들어가요.',pose:'tpose',
+    draw:(J,X,m)=>{const a=X(J.A.hd),b=X(J.B.hd),span=(J.B.hd[0]-J.A.hd[0]);const top=yH(0),bot=yH(8);
+      return `<rect x="${a[0]}" y="${top}" width="${b[0]-a[0]}" height="${bot-top}" fill="none" stroke="var(--teal)" stroke-width="2.5"/>`+brH(top-14,a[0],b[0],`팔 벌린 길이 ≈ 머리 ${f1(span)}개`,'teal')+brV(a[0]-12,top,bot,'','orange',1)+txt(a[0]+10,yH(6.5),'키 = 머리 8개','o');}},
+  {t:'팔꿈치 높이 ≈ 허리(배꼽)',d:'팔을 내리고 서면 팔꿈치는 허리의 가장 잘록한 곳, 배꼽 높이쯤에 와요.',pose:'stand',
+    draw:(J,X)=>{const y=X(J.A.el)[1];return hl(y,'orange')+dot(X(J.A.el))+dot(X(J.B.el))+dot(X(J.waist),'teal')+txt(560,y-8,'팔꿈치 = 허리','o','end');}},
+  {t:'손목 높이 ≈ 사타구니',d:'팔을 내리면 손목은 사타구니 높이, 손끝은 허벅지 중간쯤에 닿아요. 팔을 너무 짧게 그리는 실수가 많아요.',pose:'stand',
+    draw:(J,X)=>{const y=X(J.A.wr)[1],y2=X(J.A.hd)[1];return hl(y,'orange')+hl(y2,'teal')+dot(X(J.A.wr))+dot(X(J.B.wr))+dot(X(J.crotch),'teal')+txt(560,y-8,'손목 = 사타구니','o','end')+txt(560,y2-8,'손끝 = 허벅지 중간','t','end');}},
+  {t:'손 길이 ≈ 얼굴 길이',d:'손목에서 가운뎃손가락 끝까지의 길이는 턱에서 이마의 머리카락 선까지와 비슷해요. 손바닥을 얼굴에 대 보세요.',pose:'stand',
+    draw:(J,X)=>{const w=X(J.B.wr),h=X(J.B.hd);return brV(352,yH(0.25),yH(1),'얼굴 ≈ 머리 0.75개','orange',-1)+hl(yH(0.25),'grid',250,350)+brV(h[0]+26,w[1],h[1],'손 ≈ 머리 0.75개','teal',-1);}},
+  {t:'어깨너비 ≈ 머리 2개',d:'성인 남성의 어깨너비는 머리 길이 2개 정도예요. 여성은 조금 좁아 머리 1.5~1.75개 정도로 그려요.',pose:'stand',
+    draw:(J,X)=>{const a=X(J.A.sh)[0]-0.3*u,b=X(J.B.sh)[0]+0.3*u,y=X(J.A.sh)[1]+0.55*u;
+      let s='';for(let i=0;i<2;i++)s+=`<ellipse cx="${a+u/2+i*u}" cy="${y}" rx="${u/2}" ry="${0.37*u}" fill="var(--card)" fill-opacity=".55" stroke="var(--teal)" stroke-width="2.5" stroke-dasharray="5 3"/>`;
+      s+=`<path d="M${a} ${y-0.7*u}V${y+0.7*u}M${b} ${y-0.7*u}V${y+0.7*u}" stroke="var(--orange)" stroke-width="2.5"/>`;
+      return s+txt(b+12,y-6,'어깨너비','o')+txt(b+12,y+14,'≈ 머리 길이 × 2','t');}},
+  {t:'무릎 ≈ 사타구니와 발바닥의 가운데',d:'다리의 가운데에 무릎이 있어요. 허벅지와 정강이를 거의 같은 길이로 그리면 돼요.',pose:'stand',
+    draw:(J,X)=>{const k=X(J.B.kn);return hl(k[1],'orange')+brV(k[0]+44,yH(4),k[1],'머리 2개','teal',-1)+brV(k[0]+44,k[1],yH(8),'머리 2개','teal',-1)+dot(X(J.A.kn))+dot(k);}},
+  {t:'눈은 머리의 가운데',d:'눈은 정수리와 턱 사이 한가운데에 있어요. 눈을 너무 위에 그리면 이마가 좁아 보여요.',pose:'stand',
+    draw:(J,X)=>{const c=X(J.head);return hl(c[1],'orange',200,400)+`<circle cx="${c[0]-9}" cy="${c[1]}" r="3.5" fill="var(--outline)"/><circle cx="${c[0]+9}" cy="${c[1]}" r="3.5" fill="var(--outline)"/>`+brV(c[0]+40,yH(0),c[1],'½','teal',-1)+brV(c[0]+40,c[1],yH(1),'½','teal',-1)+txt(200,c[1]-8,'눈의 선','o');}}
+];
+let ruleIdx=0;
+const m2=new Mannequin($('#fig2'),{overlay:(J,X,m)=>RULES[ruleIdx].draw(J,X,m)});
+m2.pose=P(POSES.stand.p);m2.render();
+const rulesEl=$('#rules');
+RULES.forEach((r,i)=>{const b=document.createElement('button');b.className='rule'+(i===0?' on':'');b.innerHTML=`<i class="n">${i+1}</i><div><b>${r.t}</b><span>${r.d}</span></div>`;b.addEventListener('click',()=>{
+  ruleIdx=i;rulesEl.querySelectorAll('.rule').forEach((x,j)=>x.classList.toggle('on',j===i));
+  const tgt=P(POSES[r.pose].p);
+  if(m2.pose.A1!==tgt.A1)m2.animateTo(tgt);else m2.render();
+});rulesEl.appendChild(b);});
+
+/* ---------- tab 3: poser ---------- */
+const sl=$('#sliders');
+const m3=new Mannequin($('#poser'),{handles:true,loa:true,bal:true,onChange:m=>{
+  const b=m.balance||{text:'',cls:''};const st=$('#balStatus');st.textContent=b.text;st.className='status '+(b.cls||'');
+  for(const k of Object.keys(KEYNAMES)){const el=document.getElementById('s_'+k);if(el&&document.activeElement!==el)el.value=Math.round(norm(m.pose[k]));}
+}});
+for(const k of Object.keys(KEYNAMES)){
+  const l=document.createElement('label');l.innerHTML=`${KEYNAMES[k]}<input type="range" id="s_${k}" min="-180" max="180" step="1">`;sl.appendChild(l);
+  l.querySelector('input').addEventListener('input',e=>{m3.pose[k]=+e.target.value;m3.render();});
+}
+const poseChips=$('#poseChips');let curPose='walk';
+Object.entries(POSES).forEach(([k,v])=>{const b=document.createElement('button');b.className='chip'+(k===curPose?' on':'');b.textContent=v.name;b.dataset.k=k;poseChips.appendChild(b);});
+poseChips.addEventListener('click',e=>{const b=e.target.closest('[data-k]');if(!b)return;curPose=b.dataset.k;poseChips.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===b));
+  const t=P(POSES[curPose].p);if(m3.pose.facing<0)mirror(t);m3.animateTo(t);});
+function mirror(p){const s=(a,b)=>{const x=p[a];p[a]=-p[b];p[b]=-x;};for(const k of ['a0','a1','a2'])p[k]=-p[k];s('A1','B1');s('A2','B2');s('LA1','LB1');s('LA2','LB2');p.facing=-p.facing;return p;}
+$('#flipBtn').addEventListener('click',()=>{const t=mirror(Object.assign({},m3.pose));m3.animateTo(t,350);});
+$('#randBtn').addEventListener('click',()=>{
+  const r=(a,b)=>a+Math.random()*(b-a), f=m3.pose.facing;
+  poseChips.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  m3.animateTo(P({facing:f,a0:r(-15,15),a1:r(-25,25),a2:r(-25,25),A1:r(-160,160),A2:f*r(0,110),B1:r(-160,160),B2:f*r(0,110),LA1:r(-50,70)*f,LA2:-f*r(0,100),LB1:r(-50,70)*f,LB2:-f*r(0,100)}));
+});
+const t3=()=>{m3.o.loa=$('#t3loa').checked;m3.o.bal=$('#t3bal').checked;m3.o.grid=$('#t3grid').checked;m3.showHandles=$('#t3hnd').checked;if(!m3.o.bal){m3.balance=null;}m3.render();};
+['#t3loa','#t3bal','#t3grid','#t3hnd'].forEach(id=>$(id).addEventListener('change',t3));
+m3.pose=P(POSES.walk.p);m3.render();
+
+/* ---------- tab 4 ---------- */
+function myCalc(){
+  const H=parseFloat($('#myH').value), hd=parseFloat($('#myHead').value);
+  if(!(H>0)||!(hd>0)){$('#myN').textContent='—';$('#myCmp').textContent='키와 머리 길이를 숫자로 넣어 주세요.';return;}
+  const N=H/hd, Nc=Math.min(9,Math.max(3,N));
+  $('#myN').textContent=`${f1(N)}등신`;
+  const near=PRESETS.reduce((a,b)=>Math.abs(b.n-N)<Math.abs(a.n-N)?b:a);
+  $('#myCmp').textContent=(N<3||N>9)?'값을 다시 확인해 보세요. 보통 사람은 4~8등신 사이예요.':`${near.name}(${near.n}등신) 비례와 가장 비슷해요.`;
+  $('#fig4').innerHTML=drawStanding(Math.round(Nc*10)/10,{});
+}
+['#myH','#myHead'].forEach(id=>$(id).addEventListener('input',myCalc));myCalc();
+
+/* ---------- tab 5: quiz ---------- */
+const Q=[
+  {q:'성인의 몸에서 키의 절반 지점은 어디쯤일까요?',o:['배꼽','사타구니','가슴','무릎'],a:1,e:'성인은 사타구니가 키의 절반이에요. 아기는 배꼽 근처가 절반이에요.'},
+  {q:'두 팔을 양옆으로 쭉 벌린 길이는 무엇과 비슷할까요?',o:['다리 길이','어깨너비의 2배','키','키의 절반'],a:2,e:'팔 벌린 길이 ≈ 키. 다빈치의 〈비트루비우스적 인간〉이 정사각형 안에 들어가는 이유예요.'},
+  {q:'팔을 내리고 섰을 때 팔꿈치는 어느 높이에 올까요?',o:['어깨','허리(배꼽)','사타구니','무릎'],a:1,e:'팔꿈치는 허리의 잘록한 곳, 배꼽 높이쯤이에요.'},
+  {q:'손 길이(손목~가운뎃손가락 끝)와 비슷한 것은?',o:['얼굴 길이(턱~이마 머리선)','머리 2개','팔 전체','발 길이의 절반'],a:0,e:'손바닥을 얼굴에 대 보면 턱부터 이마까지를 거의 덮어요.'},
+  {q:'4등신 아기와 7.5등신 어른을 비교한 설명으로 맞는 것은?',o:['아기는 다리가 몸에 비해 길다','아기는 몸에 비해 머리가 크다','둘 다 키의 절반이 사타구니다','어른은 머리가 키의 ¼이다'],a:1,e:'아기는 머리가 키의 약 ¼이에요. 자라면서 다리가 가장 많이 길어져요.'},
+  {q:'패션 일러스트에서 9등신으로 그리는 이유는?',o:['실제 사람의 평균이라서','머리를 크게 보이게 하려고','다리를 길게 과장해 늘씬해 보이게 하려고','그리기 쉬워서'],a:2,e:'이상화된 비례로, 주로 다리를 늘여서 늘씬하고 당당한 느낌을 줘요.'},
+  {q:'동세선(line of action)에 대한 설명으로 알맞은 것은?',o:['바닥을 나타내는 선','몸 전체의 움직임 흐름을 나타내는 하나의 선','옷의 주름선','머리 단위 눈금'],a:1,e:'머리에서 몸통을 지나 체중을 받치는 발까지 이어지는 흐름이에요. 크로키의 첫 선으로 써요.'},
+  {q:'서 있는 사람이 안정돼 보이려면 목 아래에서 내린 수직선(중심선)이 어디에 떨어져야 할까요?',o:['발 위(지지면 안)','두 발 바깥','머리 앞','상관없다'],a:0,e:'중심선이 체중을 받치는 발 위에 떨어지면 균형 잡힌 자세로 보여요.'}
+];
+let qi=0,score=0;
+function quiz(){
+  const el=$('#quiz');
+  if(qi>=Q.length){
+    const msg=score===Q.length?'완벽해요! 비례 박사예요.':score>=6?'잘했어요! 틀린 문제만 다시 확인해 봐요.':'②번 탭의 규칙을 한 번 더 살펴보고 다시 도전해 봐요.';
+    el.innerHTML=`<div class="progress"><i style="width:100%"></i></div><p class="q">${Q.length}문제 중 ${score}문제를 맞혔어요.</p><p>${msg}</p><button class="btn orange" id="qRe">다시 풀기</button>`;
+    $('#qRe').onclick=()=>{qi=0;score=0;quiz();};return;
+  }
+  const it=Q[qi];
+  el.innerHTML=`<div class="progress"><i style="width:${qi/Q.length*100}%"></i></div><div class="label" style="margin-top:12px">문제 ${qi+1} / ${Q.length}</div><p class="q">${it.q}</p><div class="opts">${it.o.map((o,i)=>`<button class="opt" data-i="${i}">${o}</button>`).join('')}</div><div class="explain" id="qEx"></div>`;
+  el.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.i, ok=i===it.a; if(ok)score++;
+    el.querySelectorAll('.opt').forEach((x,j)=>{x.disabled=true;if(j===it.a)x.classList.add('right');else if(j===i)x.classList.add('wrong');});
+    $('#qEx').innerHTML=`<div class="note"><strong>${ok?'정답이에요!':'아쉬워요.'}</strong> ${it.e}</div><div class="btnrow" style="margin-top:10px"><button class="btn" id="qNext">${qi+1<Q.length?'다음 문제':'결과 보기'}</button></div>`;
+    $('#qNext').onclick=()=>{qi++;quiz();};$('#qNext').focus();
+  });
+}
+quiz();
+
+/* ---------- tabs ---------- */
+const tabs=document.querySelectorAll('.tab');
+function showTab(id){
+  tabs.forEach(t=>{const on=t.dataset.tab===id;t.classList.toggle('active',on);t.setAttribute('aria-selected',on);});
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===id));
+  try{localStorage.setItem('anatomyTab',id);}catch(_){}
+}
+tabs.forEach(t=>t.addEventListener('click',()=>showTab(t.dataset.tab)));
+try{const s=localStorage.getItem('anatomyTab');if(s&&document.getElementById(s))showTab(s);}catch(_){}
+})();
+</script>
