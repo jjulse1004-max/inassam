@@ -1,0 +1,7 @@
+Third-party assets in this film
+- Marker-on-whiteboard engine, single-line EMS Tech handwriting data (fonts/EMSTech.json), sound-effect and mix tools:
+  Lemo-Opuscar (https://github.com/lemomo-ai/lemo-opuscar), CC BY 4.0 — credit required when you publish this film or the guide.
+  (engine/wb.js is that engine, patched here only to render at 1080x1920.)
+- Subtitle face: Gaegu (fonts/Gaegu-Regular.ttf), SIL Open Font License 1.1 — fonts/OFL-Gaegu.txt.
+- Narration: Microsoft Edge neural TTS voice ko-KR-SunHiNeural (via edge-tts). Check Microsoft's terms before commercial use.
+- Music: a few kalimba-like notes synthesised in mix.py (no samples). Sound effects: synthesised procedurally.
